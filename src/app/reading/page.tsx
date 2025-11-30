@@ -1,42 +1,31 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useStore } from "@/store/useStore";
-import { db } from "@/lib/db";
-import {
-  generateReadingQuestion,
-  evaluateReading,
-  GeneratedReadingTest,
-  ReadingEvaluationResult,
-  ReadingQuestion,
-  ReadingPassage,
-} from "@/lib/gemini";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { db } from "@/lib/db";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  evaluateReading,
+  GeneratedReadingTest,
+  generateReadingQuestion,
+  ReadingEvaluationResult,
+} from "@/lib/gemini";
+import { useStore } from "@/store/useStore";
 import {
-  Loader2,
+  ArrowLeft,
   BookOpen,
   CheckCircle2,
-  XCircle,
-  AlertCircle,
-  ArrowLeft,
-  Zap,
-  FileText,
   ListChecks,
+  Loader2,
+  XCircle,
+  Zap,
 } from "lucide-react";
-import { toast } from "sonner";
 import Link from "next/link";
-import { Input } from "@/components/ui/input";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import Markdown from "react-markdown";
+import { toast } from "sonner";
 
 export default function ReadingPage() {
   const router = useRouter();
@@ -645,6 +634,12 @@ export default function ReadingPage() {
             </div>
           </div>
         </div>
+
+        {!geminiToken && (
+          <div className="bg-destructive/10 text-destructive p-4 rounded-lg text-sm">
+            Warning: No API Key found. Please configure it in Settings.
+          </div>
+        )}
 
         {/* Generation Controls */}
         <Card className="mb-6">

@@ -1,42 +1,38 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useStore } from "@/store/useStore";
-import {
-  generateQuestion,
-  evaluateWriting,
-  GeneratedQuestion,
-  EvaluationResult,
-} from "@/lib/gemini";
-import { db } from "@/lib/db";
 import { QuestionPrompt } from "@/components/QuestionPrompt";
+import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import {
-  Loader2,
-  RefreshCw,
-  Send,
-  CheckCircle,
-  AlertCircle,
-  ArrowLeft,
-  Zap,
-  Save,
-  Check,
-  PenTool,
-} from "lucide-react";
-import { toast } from "sonner";
-import Link from "next/link";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { db } from "@/lib/db";
+import {
+  evaluateWriting,
+  EvaluationResult,
+  GeneratedQuestion,
+  generateQuestion,
+} from "@/lib/gemini";
+import { useStore } from "@/store/useStore";
+import {
+  ArrowLeft,
+  Check,
+  Loader2,
+  PenTool,
+  RefreshCw,
+  Save,
+  Zap,
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function WritingPage() {
   const router = useRouter();
@@ -225,7 +221,7 @@ export default function WritingPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             {!geminiToken && (
-              <div className="bg-warning/10 text-warning-foreground p-4 rounded-lg text-sm">
+              <div className="bg-destructive/10 text-destructive p-4 rounded-lg text-sm">
                 Warning: No API Key found. Please configure it in Settings.
               </div>
             )}
