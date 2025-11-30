@@ -43,9 +43,6 @@ export default function WritingPage() {
   const geminiToken = useStore((state) => state.geminiToken);
   const geminiModel = useStore((state) => state.geminiModel);
 
-  const [level, setLevel] = useState<
-    "0-90" | "100-140" | "150-170" | "180-200"
-  >("100-140");
   const [topic, setTopic] = useState("");
   const [loading, setLoading] = useState(false);
   const [generatedQuestion, setGeneratedQuestion] =
@@ -76,7 +73,6 @@ export default function WritingPage() {
     try {
       const generatedQuestions = await generateQuestion(
         geminiToken,
-        level,
         topic,
         geminiModel || "gemini-2.5-flash"
       );
@@ -236,28 +232,6 @@ export default function WritingPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label>Target Score Range</Label>
-                <select
-                  value={level}
-                  onChange={(e) =>
-                    setLevel(
-                      e.target.value as
-                        | "0-90"
-                        | "100-140"
-                        | "150-170"
-                        | "180-200"
-                    )
-                  }
-                  className="flex h-10 w-full items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus:ring-slate-300"
-                >
-                  <option value="0-90">0-90 (Beginner)</option>
-                  <option value="100-140">100-140 (Intermediate)</option>
-                  <option value="150-170">150-170 (Advanced)</option>
-                  <option value="180-200">180-200 (Expert)</option>
-                </select>
-              </div>
-
-              <div className="space-y-2">
                 <Label>Topic / Context (Optional)</Label>
                 <Input
                   placeholder="e.g., Business Meeting, Environment..."
@@ -316,7 +290,7 @@ export default function WritingPage() {
                                   : "text-success"
                               }`}
                             >
-                              Word Count: {wordCount}/150 (Target: 120-150)
+                              Word Count: {wordCount}
                             </span>
                           )}
                         </div>
@@ -379,6 +353,11 @@ export default function WritingPage() {
                                 ? "50"
                                 : "100"}
                             </div>
+                            {evaluationResult.proficiencyLevel && (
+                              <div className="text-xl font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-lg">
+                                Level: {evaluationResult.proficiencyLevel}
+                              </div>
+                            )}
                           </div>
 
                           <div className="bg-slate-50 p-4 rounded-lg">

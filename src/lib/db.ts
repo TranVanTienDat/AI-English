@@ -10,7 +10,7 @@ interface User {
 interface Attempt {
   id: number;
   userId: number;
-  taskType: "task1" | "task2" | "task3";
+  taskType: "task1" | "task2" | "task3" | "part5" | "part6" | "part7";
   questionId?: number; // Optional if custom topic
   userContent: string; // The text or image URL (for task 1 input? no task 1 is image prompt, user writes sentence)
   // For Task 1: userContent is the sentence.

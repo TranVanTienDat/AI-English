@@ -1,6 +1,16 @@
-export const SYSTEM_PROMPT = `You are an expert TOEIC Writing examiner and teacher. 
-Your goal is to grade student submissions accurately according to ETS TOEIC Writing standards, identify errors, and provide helpful feedback to improve their skills.
-You must ALWAYS return the response in valid JSON format.`;
+export const SYSTEM_PROMPT = `
+You are a certified TOEIC Writing examiner and professional English instructor.
+Your primary role is to evaluate TOEIC Writing responses strictly following official ETS TOEIC Writing scoring standards.
+
+You must:
+- Analyze the student's writing with accuracy and fairness.
+- Identify all grammar, vocabulary, organization, tone, and content-related errors.
+- Provide detailed explanations and helpful feedback to improve the student's writing ability.
+- Suggest corrected versions and high-quality sample answers when required.
+- Assign scores based solely on ETS TOEIC Writing rubrics.
+
+You must ALWAYS return your final output in strictly valid and parseable JSON format. No additional comments, no markdown, no explanations outside the JSON response.
+`;
 
 export const TASK_1_PROMPT = (
   userResponse: string,
@@ -31,6 +41,7 @@ Student Response (containing 5 sentences):
 Return JSON:
 {
   "overall_score": number, // Total score 0-50
+  "proficiencyLevel": "Beginner" | "Intermediate" | "Advanced" | "Expert", // Assessed level
   "feedback": string, // General feedback
   "questions": [
     {
@@ -103,6 +114,7 @@ Only the "sample_response" should be in English (as it's a writing sample).
 Return JSON:
 {
   "score": number, // 0-50 (TOEIC Part 2 scale)
+  "proficiencyLevel": "Beginner" | "Intermediate" | "Advanced" | "Expert", // Assessed level
   "score_breakdown": { 
     "content": number, // 0-15 (answers all requests)
     "organization": number, // 0-10 (email format & structure)
@@ -196,6 +208,7 @@ Only the "sample_essay" should be in English (as it's a writing sample).
 Return JSON:
 {
   "score": number, // 0-100 (TOEIC Part 3 scale)
+  "proficiencyLevel": "Beginner" | "Intermediate" | "Advanced" | "Expert", // Assessed level
   "word_count": number, // Actual word count of student essay
   "score_breakdown": { 
     "development": number, // 0-30 (reasons and examples)
@@ -223,15 +236,13 @@ Return JSON:
 `;
 
 // Prompt for generating a full test (Part 1, 2, and 3)
-export const GENERATE_QUESTION_PROMPT = (
-  level: "0-90" | "100-140" | "150-170" | "180-200",
-  topic?: string
-) => `
+export const GENERATE_QUESTION_PROMPT = (topic?: string) => `
 You are an expert TOEIC Writing question creator.
 Your task is to generate a **FULL PRACTICE TEST** containing ONE question for EACH part (Part 1, Part 2, and Part 3).
 **DO NOT generate the answers.**
+**IMPORTANT: All generated questions, scenarios, emails, and topics must be strictly in ENGLISH.**
 
-Target TOEIC Writing Score Range: ${level}
+Target Difficulty: Standard TOEIC (Mixed difficulty to test all levels)
 ${
   topic
     ? `Topic/Context: "${topic}"`
@@ -266,21 +277,405 @@ Return the result in this EXACT JSON format:
       "type": "task1",
       "content": "[{\\"id\\": 1, \\"scenario\\": \\"...\\", \\"keywords\\": [\\"a\\", \\"b\\"]}, ...]",
       "keywords": [],
-      "level": "${level}",
       "description": "Write ONE sentence for EACH of the 5 pictures using the required keywords."
     },
     {
       "type": "task2",
       "content": "From: ...\\nSubject: ...\\n\\nBody...",
-      "level": "${level}",
       "description": "Respond to the email addressing all requests."
     },
     {
       "type": "task3",
       "content": "Essay question here...",
-      "level": "${level}",
       "description": "Write an opinion essay (120-150 words)."
     }
   ]
+}
+`;
+
+// ============================================
+// TOEIC READING PROMPTS
+// ============================================
+
+export const READING_SYSTEM_PROMPT = `You are an expert TOEIC Reading examiner and teacher.
+Your goal is to evaluate student answers accurately according to ETS TOEIC Reading standards and provide helpful feedback.
+You must ALWAYS return the response in valid JSON format.`;
+
+// Part 5: Incomplete Sentences (30 questions)
+export const READING_PART5_EVALUATION_PROMPT = (
+  questions: Array<{
+    id: number;
+    sentence: string;
+    options: string[];
+    correctAnswer: string;
+    userAnswer: string;
+  }>
+) => `
+Task: Evaluate TOEIC Reading Part 5 - Incomplete Sentences
+
+Questions and User Answers:
+${JSON.stringify(questions, null, 2)}
+
+**EVALUATION REQUIREMENTS:**
+1. Check if user's answer matches the correct answer
+2. Explain WHY the correct answer is right (grammar rule, vocabulary, collocation)
+3. Explain WHY other options are wrong
+4. Identify the grammar/vocabulary point being tested
+5. Provide tips for similar questions
+
+**IMPORTANT**: Provide ALL feedback and explanations in **VIETNAMESE** (Tiếng Việt).
+
+**SCORING INSTRUCTION:**
+Calculate "scaledScore" (5-495) as an ESTIMATED TOEIC Reading score based on the user's accuracy in this part.
+- Example: 100% accuracy -> ~495
+- Example: 70% accuracy -> ~300-350
+- Example: 50% accuracy -> ~200
+
+Return JSON:
+{
+  "totalQuestions": number,
+  "correctAnswers": number,
+  "score": number, // Raw score (number correct)
+  "scaledScore": number, // Estimated TOEIC Reading score (5-495) based on accuracy
+  "proficiencyLevel": "Beginner" | "Intermediate" | "Advanced" | "Expert", // Assessed level
+  "feedback": string, // Overall feedback in Vietnamese
+  "questionResults": [
+    {
+      "questionId": number,
+      "userAnswer": string,
+      "correctAnswer": string,
+      "isCorrect": boolean,
+      "explanation": string, // Why correct answer is right (Vietnamese)
+      "wrongOptions": [
+        {
+          "option": string,
+          "reason": string // Why this option is wrong (Vietnamese)
+        }
+      ],
+      "grammarPoint": string, // Grammar/vocabulary point tested (Vietnamese)
+      "tip": string // Tip for similar questions (Vietnamese)
+    }
+  ]
+}
+`;
+
+// Part 6: Text Completion (16 questions, 4 passages × 4 questions each)
+export const READING_PART6_EVALUATION_PROMPT = (
+  passages: Array<{
+    passageId: number;
+    passageText: string;
+    questions: Array<{
+      id: number;
+      blankNumber: number;
+      options: string[];
+      correctAnswer: string;
+      userAnswer: string;
+    }>;
+  }>
+) => `
+Task: Evaluate TOEIC Reading Part 6 - Text Completion
+
+Passages and User Answers:
+${JSON.stringify(passages, null, 2)}
+
+**EVALUATION REQUIREMENTS:**
+1. Check if user's answer matches the correct answer
+2. Explain how the answer fits the CONTEXT of the passage
+3. Analyze coherence and cohesion
+4. Explain why other options don't fit the context
+5. Provide passage meaning analysis
+
+**IMPORTANT**: Provide ALL feedback and explanations in **VIETNAMESE** (Tiếng Việt).
+
+**SCORING INSTRUCTION:**
+Calculate "scaledScore" (5-495) as an ESTIMATED TOEIC Reading score based on the user's accuracy in this part.
+
+Return JSON:
+{
+  "totalQuestions": number,
+  "correctAnswers": number,
+  "score": number,
+  "scaledScore": number, // Estimated TOEIC Reading score (5-495) based on accuracy
+  "proficiencyLevel": "Beginner" | "Intermediate" | "Advanced" | "Expert", // Assessed level
+  "feedback": string,
+  "passageResults": [
+    {
+      "passageId": number,
+      "passageType": string, // e.g., "Email", "Notice", "Advertisement"
+      "passageSummary": string, // Brief summary in Vietnamese
+      "questionResults": [
+        {
+          "questionId": number,
+          "blankNumber": number,
+          "userAnswer": string,
+          "correctAnswer": string,
+          "isCorrect": boolean,
+          "explanation": string, // Context-based explanation (Vietnamese)
+          "coherenceNote": string, // How it connects to surrounding text (Vietnamese)
+          "wrongOptions": [
+            {
+              "option": string,
+              "reason": string
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+`;
+
+// Part 7: Reading Comprehension (54 questions)
+export const READING_PART7_EVALUATION_PROMPT = (
+  passages: Array<{
+    passageId: number;
+    passageType: "single" | "double" | "triple";
+    passageTexts: string[]; // Array of passage texts
+    questions: Array<{
+      id: number;
+      questionText: string;
+      questionType:
+        | "detail"
+        | "inference"
+        | "purpose"
+        | "vocabulary"
+        | "reference";
+      options: string[];
+      correctAnswer: string;
+      userAnswer: string;
+    }>;
+  }>
+) => `
+Task: Evaluate TOEIC Reading Part 7 - Reading Comprehension
+
+Passages and User Answers:
+${JSON.stringify(passages, null, 2)}
+
+**EVALUATION REQUIREMENTS:**
+1. Check if user's answer matches the correct answer
+2. Provide EVIDENCE from the passage supporting the correct answer
+3. Explain the reasoning (detail/inference/purpose/etc.)
+4. For inference questions, explain the logical connection
+5. For reference questions, identify what the pronoun refers to
+6. For double/triple passages, explain cross-passage connections
+
+**IMPORTANT**: Provide ALL feedback and explanations in **VIETNAMESE** (Tiếng Việt).
+
+**SCORING INSTRUCTION:**
+Calculate "scaledScore" (5-495) as an ESTIMATED TOEIC Reading score based on the user's accuracy in this part.
+
+Return JSON:
+{
+  "totalQuestions": number,
+  "correctAnswers": number,
+  "score": number,
+  "scaledScore": number, // Estimated TOEIC Reading score (5-495) based on accuracy
+  "proficiencyLevel": "Beginner" | "Intermediate" | "Advanced" | "Expert", // Assessed level
+  "feedback": string,
+  "passageResults": [
+    {
+      "passageId": number,
+      "passageType": "single" | "double" | "triple",
+      "passageSummary": string, // Brief summary in Vietnamese
+      "questionResults": [
+        {
+          "questionId": number,
+          "questionText": string,
+          "questionType": string,
+          "userAnswer": string,
+          "correctAnswer": string,
+          "isCorrect": boolean,
+          "evidence": string, // Quote from passage supporting answer
+          "explanation": string, // Detailed explanation (Vietnamese)
+          "wrongOptions": [
+            {
+              "option": string,
+              "reason": string
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+`;
+
+// Generate Reading Questions
+export const GENERATE_READING_QUESTION_PROMPT = (
+  part: 5 | 6 | 7,
+  topic?: string,
+  batchNumber?: number // For Part 5 and 7 batch generation
+) => `
+You are an expert TOEIC Reading question creator.
+Generate questions for TOEIC Reading Part ${part}.
+**IMPORTANT: All content must be strictly in ENGLISH.**
+
+Target Difficulty: Standard TOEIC (Mixed difficulty to test all levels)
+${
+  topic
+    ? `Topic/Context: "${topic}"`
+    : "Topic: Choose a common TOEIC theme (Business, Office, Travel, Technology, Education)."
+}
+
+${
+  part === 5
+    ? `
+### Part 5: Incomplete Sentences
+Generate 10 questions testing grammar and vocabulary.
+${
+  batchNumber
+    ? `This is batch ${batchNumber} of 3. Start question IDs from ${
+        (batchNumber - 1) * 10 + 1
+      }.`
+    : ""
+}
+
+**Question Types to Include:**
+- Verb tenses (2-3 questions)
+- Prepositions (2 questions)
+- Conjunctions (1-2 questions)
+- Word forms (adjective/adverb/noun) (2 questions)
+- Vocabulary/collocations (2-3 questions)
+
+**Difficulty Guidelines:**
+- Generate a mix of easy, medium, and hard questions to accurately assess the user's level.
+
+Return JSON:
+{
+  "part": 5,
+  "batchNumber": ${batchNumber || 1},
+  "questions": [
+    {
+      "id": number, // Start from ${
+        batchNumber ? (batchNumber - 1) * 10 + 1 : 1
+      }
+      "sentence": string, // Sentence with blank marked as ___
+      "options": ["A", "B", "C", "D"], // Four options
+      "correctAnswer": string, // "A", "B", "C", or "D"
+      "grammarPoint": string // What is being tested
+    }
+  ]
+}
+`
+    : part === 6
+    ? `
+### Part 6: Text Completion
+Generate 4 passages, each with 4 blanks (total 16 questions).
+
+**Passage Types:** Email, Notice, Advertisement, Memo, Article
+
+**Question Types per Passage:**
+- 2-3 grammar/vocabulary questions
+- 1-2 sentence insertion questions (choose complete sentence to insert)
+
+**Difficulty Guidelines:**
+- Generate a mix of easy, medium, and hard passages/questions.
+
+Return JSON:
+{
+  "part": 6,
+  "passages": [
+    {
+      "id": number, // 1-4
+      "type": string, // "Email", "Notice", etc.
+      "text": string, // Full passage with blanks marked as [1], [2], [3], [4]
+      "questions": [
+        {
+          "id": number, // Global ID (1-16)
+          "blankNumber": number, // 1-4 (within this passage)
+          "type": "word" | "sentence",
+          "options": ["A", "B", "C", "D"],
+          "correctAnswer": string
+        }
+      ]
+    }
+  ]
+}
+`
+    : `
+### Part 7: Reading Comprehension
+${
+  batchNumber
+    ? `Generate passages for batch ${batchNumber} of 6.`
+    : "Generate passages with questions."
+}
+${
+  batchNumber === 1
+    ? "Generate ~18-20 questions. Include: 4 Single Passages (approx 13-15 questions) and 1 Double Passage (5 questions)."
+    : ""
+}
+${
+  batchNumber === 2
+    ? "Generate ~18-20 questions. Include: 3 Single Passages (approx 10 questions), 1 Double Passage (5 questions), and 1 Triple Passage (5 questions)."
+    : ""
+}
+${
+  batchNumber === 3
+    ? "Generate ~15 questions. Include: 3 Single Passages (approx 10 questions) and 1 Triple Passage (5 questions)."
+    : ""
+}
+
+**Passage Types:**
+- Single: Email, Article, Notice, Advertisement, Form
+- Double: Related emails, Article + Chart, Notice + Schedule
+- Triple: Email chain, Multiple related documents
+
+**Question Types:**
+- Detail questions (What/When/Where/Who)
+- Inference questions (What is implied/suggested)
+- Purpose questions (Why was this written)
+- Vocabulary in context
+- Reference questions (What does "it" refer to)
+- Cross-passage questions (for double/triple)
+
+**Difficulty Guidelines:**
+- Generate a mix of easy, medium, and hard passages/questions.
+
+Return JSON:
+{
+  "part": 7,
+  "batchNumber": ${batchNumber || 1},
+  "passages": [
+    {
+      "id": number,
+      "type": "single" | "double" | "triple",
+      "texts": [string], // Array of passage texts
+      "questions": [
+        {
+          "id": number, // Global question ID
+          "questionText": string,
+          "questionType": "detail" | "inference" | "purpose" | "vocabulary" | "reference",
+          "options": ["A", "B", "C", "D"],
+          "correctAnswer": string
+        }
+      ]
+    }
+  ]
+}
+`
+}
+`;
+
+export const ANALYZE_PROGRESS_PROMPT = (data: string) => `
+You are a personal TOEIC tutor.
+Analyze the following student progress data (JSON) which contains a list of recent practice attempts.
+Each attempt has a date, task type, score, and identified error types.
+
+Data:
+${data}
+
+Task:
+1. Identify trends in the student's performance (improving, declining, stable).
+2. Identify specific weak points based on the "errors" arrays (e.g., frequent grammar mistakes, vocabulary issues).
+3. Provide actionable advice for improvement in Vietnamese.
+
+Return JSON:
+{
+  "trend": "improving" | "declining" | "stable" | "mixed",
+  "summary": string, // A brief summary of performance in Vietnamese
+  "strengths": string[], // List of strengths in Vietnamese
+  "weaknesses": string[], // List of weaknesses in Vietnamese
+  "advice": string // Actionable advice in Vietnamese
+  "level": "A1" | "A2" | "B1" | "B2" | "C1" | "C2"
 }
 `;
