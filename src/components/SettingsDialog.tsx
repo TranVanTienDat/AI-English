@@ -33,14 +33,14 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const [currentToken, setCurrentToken] = useState(geminiToken || "");
   const [currentPrompt, setCurrentPrompt] = useState(aiPrompt || "");
   const [currentModel, setCurrentModel] = useState(
-    geminiModel || "gemini-1.5-flash"
+    geminiModel || "gemini-2.5-flash"
   );
 
   useEffect(() => {
     if (open) {
       setCurrentToken(geminiToken || "");
       setCurrentPrompt(aiPrompt || "");
-      setCurrentModel(geminiModel || "gemini-1.5-flash");
+      setCurrentModel(geminiModel || "gemini-2.5-flash");
     }
   }, [open, geminiToken, aiPrompt, geminiModel]);
 

@@ -68,7 +68,7 @@ export default function PracticePage({
             question.content || question.subject || question.topic, // Handle different structures
           keywords: question.keywords,
         },
-        geminiModel || "gemini-1.5-flash"
+        geminiModel || "gemini-2.5-flash"
       );
 
       // Save to DB

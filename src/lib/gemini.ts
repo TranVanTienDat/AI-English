@@ -9,6 +9,7 @@ import {
 
 export interface EvaluationResult {
   score: number;
+  overall_score?: number; // For Part 1 total score (0-50)
   feedback: string;
   errors: Array<{
     text: string;
@@ -20,6 +21,30 @@ export interface EvaluationResult {
   sample_response?: string;
   sample_essay?: string;
   score_breakdown?: any;
+  // Part 1 specific
+  keywords_used?: {
+    keyword1: boolean;
+    keyword2: boolean;
+  };
+  // Part 2 specific
+  requests_answered?: {
+    total_requests: number;
+    answered: number;
+    missing: string[];
+  };
+  format_check?: {
+    has_greeting: boolean;
+    has_closing: boolean;
+    has_signature: boolean;
+  };
+  // Part 3 specific
+  word_count?: number;
+  structure_analysis?: {
+    has_introduction: boolean;
+    has_body_paragraphs: boolean;
+    has_conclusion: boolean;
+    has_examples: boolean;
+  };
 }
 
 export interface GeneratedQuestion {
@@ -47,7 +72,11 @@ export const evaluateWriting = async (
 
   switch (taskType) {
     case "task1":
-      prompt = TASK_1_PROMPT(data.userContent, data.keywords || []);
+      prompt = TASK_1_PROMPT(
+        data.userContent,
+        data.keywords || [],
+        data.questionContent // Pass scenario description for Part 1
+      );
       break;
     case "task2":
       prompt = TASK_2_PROMPT(data.questionContent || "", data.userContent);
@@ -85,12 +114,10 @@ export const generateQuestion = async (
   apiKey: string,
   level: "0-90" | "100-140" | "150-170" | "180-200",
   topic?: string,
-  part?: "part1" | "part2" | "part3",
   modelName: string = "gemini-2.5-flash"
-): Promise<GeneratedQuestion> => {
+): Promise<GeneratedQuestion[]> => {
   const ai = new GoogleGenAI({ apiKey });
-
-  const prompt = GENERATE_QUESTION_PROMPT(level, topic, part);
+  const prompt = GENERATE_QUESTION_PROMPT(level, topic);
   const fullPrompt = `${SYSTEM_PROMPT}\n\n${prompt}`;
 
   try {
@@ -105,9 +132,20 @@ export const generateQuestion = async (
     const text = response.text;
     if (!text) throw new Error("No response from AI");
 
-    return JSON.parse(text) as GeneratedQuestion;
+    try {
+      const json = JSON.parse(text);
+      // Handle the new format: { questions: [...] }
+      if (json.questions && Array.isArray(json.questions)) {
+        return json.questions;
+      }
+      // Fallback for older format or unexpected structure (wrap in array)
+      return [json];
+    } catch (e) {
+      console.error("Failed to parse JSON:", e);
+      throw new Error("Invalid JSON response from AI");
+    }
   } catch (error) {
-    console.error("Gemini Generation Error:", error);
-    throw new Error("Failed to generate question. Please check your API Key.");
+    console.error("Error generating question:", error);
+    throw error;
   }
 };

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { User } from "@/lib/db";
+import { indexedDBStorage } from "@/lib/indexeddb-storage";
 
 interface AppState {
   currentUser: User | null;
@@ -24,13 +25,14 @@ export const useStore = create<AppState>()(
       setIsLoading: (loading) => set({ isLoading: loading }),
       geminiToken: null,
       setGeminiToken: (token) => set({ geminiToken: token }),
-      geminiModel: "gemini-1.5-flash",
+      geminiModel: "gemini-2.5-flash",
       setGeminiModel: (model) => set({ geminiModel: model }),
       aiPrompt: null,
       setAiPrompt: (prompt) => set({ aiPrompt: prompt }),
     }),
     {
       name: "toeic-app-storage",
+      storage: indexedDBStorage as any,
       partialize: (state) => ({
         currentUser: state.currentUser,
         geminiToken: state.geminiToken,

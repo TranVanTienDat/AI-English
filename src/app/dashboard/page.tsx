@@ -11,7 +11,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, History, Zap } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpenText,
+  History,
+  NotebookPen,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 
 export default function Dashboard() {
@@ -34,21 +40,45 @@ export default function Dashboard() {
         <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
           <Zap size={24} className="text-amber-500" /> Tools & Resources
         </h2>
-        <div className="grid grid-cols-1 gap-6">
+        <div className="grid grid-cols-2 gap-6">
           {/* Generate Questions Card */}
-          <Link href="/generate" className="block group">
+          <Link href="/writing" className="block group">
             <Card className="h-full hover:shadow-lg transition-all duration-300 border-slate-200 dark:border-slate-700 overflow-hidden">
-              <div className="h-2 w-full bg-emerald-500" />
               <CardHeader>
                 <div className="w-12 h-12 rounded-lg bg-emerald-500 bg-opacity-10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Zap className="w-6 h-6 text-emerald-500" />
+                  <NotebookPen className="w-6 h-6 text-white" />
                 </div>
                 <CardTitle className="text-xl">
-                  Generate Practice Question
+                  Generate Writing Question
                 </CardTitle>
                 <CardDescription>
-                  AI creates a new practice topic or question for you to write
-                  about.
+                  AI creates a new writing question (Part 1, 2, or 3) for you to
+                  practice.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-between group-hover:bg-slate-50 dark:group-hover:bg-slate-800"
+                >
+                  Start Practice <ArrowRight size={16} />
+                </Button>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/reading" className="block group">
+            <Card className="h-full hover:shadow-lg transition-all duration-300 border-slate-200 dark:border-slate-700 overflow-hidden">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-lg bg-emerald-500 bg-opacity-10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <BookOpenText className="w-6 h-6 text-white" />
+                </div>
+                <CardTitle className="text-xl">
+                  Generate Reading Question
+                </CardTitle>
+                <CardDescription>
+                  AI creates a new reading question (Part 1, 2, or 3) for you to
+                  practice.
                 </CardDescription>
               </CardHeader>
               <CardContent>

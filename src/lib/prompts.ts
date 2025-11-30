@@ -2,192 +2,285 @@ export const SYSTEM_PROMPT = `You are an expert TOEIC Writing examiner and teach
 Your goal is to grade student submissions accurately according to ETS TOEIC Writing standards, identify errors, and provide helpful feedback to improve their skills.
 You must ALWAYS return the response in valid JSON format.`;
 
-export const TASK_1_PROMPT = (userSentence: string, keywords: string[]) => `
-Task: Write a Sentence Based on a Picture (TOEIC Writing Part 1).
-Keywords provided: ${keywords.join(", ")}.
-Student Sentence: "${userSentence}"
+export const TASK_1_PROMPT = (
+  userResponse: string,
+  keywords: string[], // This might be unused now, as scenarios have their own keywords
+  scenarioDescription?: string // This contains the JSON string of 5 scenarios
+) => `
+Task: Write 5 Sentences Based on 5 Pictures (TOEIC Writing Part 1 - Questions 1-5).
 
-Grade this sentence using the **TOEIC Writing Part 1 scoring scale (0-3 points)**:
-- 3: Excellent - Grammatically correct, uses both keywords appropriately, describes a logical scenario
-- 2: Good - Minor grammar issues or slightly awkward phrasing, but uses both keywords
-- 1: Limited - Significant grammar errors or only uses one keyword correctly
-- 0: Poor - Major errors, doesn't use keywords, or incomprehensible
+Scenarios & Keywords (JSON):
+${scenarioDescription}
+
+Student Response (containing 5 sentences):
+"${userResponse}"
+
+**CRITICAL REQUIREMENTS FOR PART 1:**
+1. Student must write ONE sentence for EACH of the 5 scenarios.
+2. Each sentence must use BOTH keywords specified for that scenario.
+3. Sentences must be grammatically correct and relevant to the scenario.
+
+**SCORING CRITERIA (Per Question, 0-10 points, Total 50 points):**
+- 9-10: Perfect grammar, uses both keywords, relevant.
+- 7-8: Uses keywords, minor grammar errors, relevant.
+- 4-6: Uses only 1 keyword OR major grammar errors OR unclear.
+- 0-3: No keywords OR incomprehensible OR off-topic.
 
 **IMPORTANT**: Provide ALL feedback and explanations in **VIETNAMESE** (Tiếng Việt).
-Only the "better_version" should be in English (as it's a writing sample).
 
 Return JSON:
 {
-  "score": number, // 0-3 (TOEIC Part 1 scale)
-  "feedback": string, // General feedback IN VIETNAMESE
-  "errors": [
-    { 
-      "text": string, // The error text from student's sentence
-      "type": "grammar" | "vocabulary" | "spelling", 
-      "correction": string, // Corrected version in English
-      "explanation": string // Explanation IN VIETNAMESE
+  "overall_score": number, // Total score 0-50
+  "feedback": string, // General feedback
+  "questions": [
+    {
+      "id": number, // 1-5
+      "score": number, // 0-10
+      "keywords_used": { "keyword1": boolean, "keyword2": boolean },
+      "errors": [{ "text": string, "correction": string, "explanation": string }],
+      "better_version": string, // Sample answer
+      "feedback": string // Specific feedback for this sentence
     }
-  ],
-  "better_version": string // A high-quality sample sentence in English using the keywords (score 3/3)
+  ]
 }
 `;
 
 export const TASK_2_PROMPT = (emailContent: string, userResponse: string) => `
-Task: Respond to a Written Request (TOEIC Writing Part 2).
+Task: Respond to a Written Request (TOEIC Writing Part 2 - Questions 6-7).
+
 Incoming Email:
 "${emailContent}"
 
 Student Response:
 "${userResponse}"
 
-Grade this response using the **TOEIC Writing Part 2 scoring scale (0-4 points)**:
-- 4: Excellent - Varied sentence structures, appropriate vocabulary, clear organization, complete content
-- 3: Good - Minor issues in vocabulary, grammar, or organization but generally effective
-- 2: Adequate - Noticeable errors or incomplete content, but comprehensible
-- 1: Limited - Significant errors that interfere with understanding
-- 0: Very poor or off-topic response
+**CRITICAL REQUIREMENTS FOR PART 2:**
+1. Must have proper email format:
+   - Greeting (Dear Mr./Ms., Hi [Name]...)
+   - Opening sentence
+   - Body addressing ALL requests
+   - Closing sentence
+   - Signature
+2. Must answer ALL requests/questions in the incoming email
+3. Must use appropriate formal/professional tone
+4. Must be well-organized and clear
+
+**SCORING CRITERIA (0-50 points):**
+- **45-50 points (Excellent)**:
+  - Answers ALL requests completely
+  - Proper email format (greeting, body, closing, signature)
+  - Varied sentence structures
+  - Appropriate vocabulary and professional tone
+  - Clear organization
+  
+- **35-44 points (Good)**:
+  - Answers most/all requests
+  - Has email format (may miss minor elements)
+  - Minor grammar or vocabulary issues
+  - Generally professional tone
+  
+- **25-34 points (Adequate)**:
+  - Answers some requests (missing 1-2)
+  - Basic email format
+  - Noticeable grammar errors
+  - Somewhat informal tone
+  
+- **10-24 points (Limited)**:
+  - Missing many requests
+  - Poor email format (no greeting/closing)
+  - Significant grammar errors
+  - Inappropriate tone
+  
+- **0-9 points (Poor)**:
+  - Doesn't answer requests
+  - No email format
+  - Major errors throughout
+  - Off-topic
 
 **IMPORTANT**: Provide ALL feedback, explanations, and comments in **VIETNAMESE** (Tiếng Việt).
 Only the "sample_response" should be in English (as it's a writing sample).
 
 Return JSON:
 {
-  "score": number, // 0-4 (TOEIC Part 2 scale)
+  "score": number, // 0-50 (TOEIC Part 2 scale)
   "score_breakdown": { 
-    "quality": number, // 0-1 (sentence quality and variety)
-    "vocabulary": number, // 0-1 (appropriate word choice)
-    "organization": number, // 0-1 (clear structure)
-    "content": number // 0-1 (completeness and relevance)
+    "content": number, // 0-15 (answers all requests)
+    "organization": number, // 0-10 (email format & structure)
+    "grammar_vocabulary": number, // 0-15 (language quality)
+    "tone": number // 0-10 (professional/appropriate)
   },
   "feedback": string, // General feedback IN VIETNAMESE
+  "requests_answered": {
+    "total_requests": number, // Total number of requests in incoming email
+    "answered": number, // How many the student answered
+    "missing": string[] // List of missing requests IN VIETNAMESE
+  },
+  "format_check": {
+    "has_greeting": boolean,
+    "has_closing": boolean,
+    "has_signature": boolean
+  },
   "errors": [
     { 
       "text": string, // The error text from student's writing
-      "type": "grammar" | "vocabulary" | "tone" | "organization", 
+      "type": "grammar" | "vocabulary" | "tone" | "organization" | "format", 
       "correction": string, // Corrected version in English
       "explanation": string // Explanation IN VIETNAMESE
     }
   ],
-  "sample_response": string // A model email response in English (score 4/4)
+  "sample_response": string // A model email response in English (score 50/50)
 }
 `;
 
 export const TASK_3_PROMPT = (topic: string, userEssay: string) => `
-Task: Write an Opinion Essay (TOEIC Writing Part 3).
+Task: Write an Opinion Essay (TOEIC Writing Part 3 - Question 8).
+
 Topic: "${topic}"
 
 Student Essay:
 "${userEssay}"
 
-Grade this essay using the **TOEIC Writing Part 3 scoring scale (0-5 points)**:
-- 5: Excellent - Strong support with reasons and examples, varied grammar, rich vocabulary, clear organization
-- 4: Good - Generally well-supported with minor issues in grammar, vocabulary, or organization
-- 3: Adequate - Some support but with noticeable errors or weak organization
-- 2: Limited - Weak support, significant grammar/vocabulary errors
-- 1: Very limited - Minimal support, major errors throughout
-- 0: Very poor or off-topic essay
+**CRITICAL REQUIREMENTS FOR PART 3:**
+1. Word count: 120-150 words (essays <120 words are heavily penalized)
+2. Must have clear 4-paragraph structure:
+   - Introduction (state opinion)
+   - Body Paragraph 1 (reason 1 + example)
+   - Body Paragraph 2 (reason 2 + example)
+   - Conclusion (restate opinion)
+3. Must provide specific reasons and examples
+4. Must use transition words/phrases for coherence
+5. Must stay on topic
 
+**SCORING CRITERIA (0-100 points):**
+- **90-100 points (Excellent)**:
+  - 120-150 words
+  - Clear 4-paragraph structure
+  - Strong reasons with specific examples
+  - Varied grammar structures
+  - Rich, precise vocabulary
+  - Excellent coherence with transition words
+  
+- **75-89 points (Good)**:
+  - Meets word count
+  - Has structure (may be slightly unclear)
+  - Good reasons with examples
+  - Minor grammar issues
+  - Good vocabulary
+  - Generally coherent
+  
+- **50-74 points (Adequate)**:
+  - Meets/close to word count
+  - Basic structure
+  - Some reasons but weak examples
+  - Noticeable grammar errors
+  - Adequate vocabulary
+  - Some coherence issues
+  
+- **25-49 points (Limited)**:
+  - Below word count OR
+  - Poor structure
+  - Weak reasons, no examples
+  - Significant grammar errors
+  - Limited vocabulary
+  - Poor coherence
+  
+- **0-24 points (Very Limited)**:
+  - Well below word count
+  - No clear structure
+  - Minimal support
+  - Major errors throughout
+  
 **IMPORTANT**: Provide ALL feedback, explanations, and comments in **VIETNAMESE** (Tiếng Việt).
 Only the "sample_essay" should be in English (as it's a writing sample).
 
 Return JSON:
 {
-  "score": number, // 0-5 (TOEIC Part 3 scale)
+  "score": number, // 0-100 (TOEIC Part 3 scale)
+  "word_count": number, // Actual word count of student essay
   "score_breakdown": { 
-    "support": number, // 0-1.25 (reasons and examples)
-    "grammar": number, // 0-1.25
-    "vocabulary": number, // 0-1.25
-    "organization": number // 0-1.25
+    "development": number, // 0-30 (reasons and examples)
+    "organization": number, // 0-20 (structure and coherence)
+    "grammar": number, // 0-25
+    "vocabulary": number // 0-25
+  },
+  "structure_analysis": {
+    "has_introduction": boolean,
+    "has_body_paragraphs": boolean,
+    "has_conclusion": boolean,
+    "has_examples": boolean
   },
   "feedback": string, // General feedback IN VIETNAMESE
   "errors": [
     { 
       "text": string, // The error text from student's writing
-      "type": "grammar" | "vocabulary" | "coherence", 
+      "type": "grammar" | "vocabulary" | "coherence" | "structure" | "word_count", 
       "correction": string, // Corrected version in English
       "explanation": string // Explanation IN VIETNAMESE
     }
   ],
-  "sample_essay": string // A model essay in English (score 5/5, minimum 300 words)
+  "sample_essay": string // A model essay in English (score 100/100, 120-150 words)
 }
 `;
 
-// Prompt for generating a new question based on level, optional topic, and optional part
+// Prompt for generating a full test (Part 1, 2, and 3)
 export const GENERATE_QUESTION_PROMPT = (
   level: "0-90" | "100-140" | "150-170" | "180-200",
-  topic?: string,
-  part?: "part1" | "part2" | "part3"
+  topic?: string
 ) => `
 You are an expert TOEIC Writing question creator.
-Your task is to generate a **PRACTICE QUESTION** for a student to answer.
-**DO NOT generate the answer or response.**
+Your task is to generate a **FULL PRACTICE TEST** containing ONE question for EACH part (Part 1, Part 2, and Part 3).
+**DO NOT generate the answers.**
 
 Target TOEIC Writing Score Range: ${level}
 ${
-  level === "0-90"
-    ? "- Beginner level: Simple vocabulary, basic grammar structures"
-    : ""
-}
-${
-  level === "100-140"
-    ? "- Intermediate level: Moderate vocabulary, varied sentence structures"
-    : ""
-}
-${
-  level === "150-170"
-    ? "- Advanced level: Rich vocabulary, complex grammar, sophisticated ideas"
-    : ""
-}
-${
-  level === "180-200"
-    ? "- Expert level: Native-like proficiency, nuanced expression, exceptional coherence"
-    : ""
-}
-${
   topic
-    ? `Topic: "${topic}"`
-    : "Topic: Choose a common TOEIC theme (e.g., Business, Office, Travel, Technology)."
+    ? `Topic/Context: "${topic}"`
+    : "Topic: Choose a common TOEIC theme (e.g., Business, Office, Travel, Technology, Education)."
 }
 
-${
-  part
-    ? `Generate a **${
-        part === "part1"
-          ? "Part 1 (Picture Sentence)"
-          : part === "part2"
-          ? "Part 2 (Email Response)"
-          : "Part 3 (Opinion Essay)"
-      }** question.`
-    : "Decide whether to create a **Part 2 (Email Response)** or **Part 3 (Opinion Essay)**."
-}
+---
 
-### Instructions for Part 1 (Picture Sentence):
-- Generate a **SCENARIO DESCRIPTION** (describe a scene/situation) and **TWO KEYWORDS**.
-- The student will write a sentence using both keywords to describe the scenario.
-- Example: 
-  - Scenario: "A business meeting in an office"
-  - Keywords: "discuss", "presentation"
-- **DO NOT** write the sentence for them.
+### Part 1: Picture Sentence
+Generate **5 Different Scenarios**, each with **Two Keywords**.
+- For each (1-5):
+  - Scenario: Describe a scene clearly.
+  - Keywords: Two mandatory words.
+- Format the "content" field for Part 1 as a **JSON String** of an array: \`[{ "id": 1, "scenario": "...", "keywords": ["...", "..."] }, ...]\`
 
-### Instructions for Part 2 (Email Response):
-- Generate the **INCOMING EMAIL** that the student needs to read and reply to.
-- Include:
-  - **From**: [Sender Name/Title]
-  - **Subject**: [Subject Line]
-  - **Body**: [The email text asking for information, making a request, or complaining]
-- **DO NOT** write the reply email.
+### Part 2: Email Response
+Generate an **Incoming Email** with 2-4 requests.
+- Include From, Subject, and Body.
+- Requests must be clear (e.g., ask for info, schedule meeting).
 
-### Instructions for Part 3 (Opinion Essay):
-- Generate the **ESSAY QUESTION** or **TOPIC STATEMENT**.
-- Example: "Some people prefer to work alone. Others prefer to work in a team. Which do you prefer and why? Give reasons and examples."
-- **DO NOT** write the essay.
+### Part 3: Opinion Essay
+Generate an **Essay Topic/Question**.
+- Ask for opinion, reasons, and examples.
+- E.g., "Do you agree that...?" or "Some people prefer..."
 
-Return the result in JSON format:
+---
+
+Return the result in this EXACT JSON format:
 {
-  "type": "task1" | "task2" | "task3", // Keep using task1/2/3 for compatibility with existing code
-  "content": string, // For Part 1: scenario description; For Part 2: INCOMING EMAIL; For Part 3: ESSAY QUESTION
-  "keywords": string[], // Only for Part 1 (two keywords)
-  "level": "${level}",
-  "topic_used": string // The specific topic/theme you chose
+  "questions": [
+    {
+      "type": "task1",
+      "content": "[{\\"id\\": 1, \\"scenario\\": \\"...\\", \\"keywords\\": [\\"a\\", \\"b\\"]}, ...]",
+      "keywords": [],
+      "level": "${level}",
+      "description": "Write ONE sentence for EACH of the 5 pictures using the required keywords."
+    },
+    {
+      "type": "task2",
+      "content": "From: ...\\nSubject: ...\\n\\nBody...",
+      "level": "${level}",
+      "description": "Respond to the email addressing all requests."
+    },
+    {
+      "type": "task3",
+      "content": "Essay question here...",
+      "level": "${level}",
+      "description": "Write an opinion essay (120-150 words)."
+    }
+  ]
 }
 `;
