@@ -144,9 +144,24 @@ export default function ReadingPage() {
       }
 
       toast.success("Đã tạo câu hỏi thành công!");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error generating question:", error);
-      toast.error("Không thể tạo câu hỏi. Vui lòng kiểm tra API Key.");
+      let errorMessage = "Không thể tạo câu hỏi. Vui lòng kiểm tra API Key.";
+      if (error instanceof Error) {
+        try {
+          const errorBody = JSON.parse(error.message);
+          if (errorBody?.error?.message) {
+            errorMessage = errorBody.error.message;
+          } else {
+            errorMessage = error.message;
+          }
+        } catch {
+          errorMessage = error.message;
+        }
+      } else if (error?.error?.message) {
+        errorMessage = error.error.message;
+      }
+      toast.error(errorMessage);
     } finally {
       setIsGenerating(false);
       setLoadingStatus("");
@@ -238,9 +253,24 @@ export default function ReadingPage() {
       }
 
       toast.success("Đã chấm bài thành công!");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error evaluating:", error);
-      toast.error("Không thể chấm bài. Vui lòng thử lại.");
+      let errorMessage = "Không thể chấm bài. Vui lòng thử lại.";
+      if (error instanceof Error) {
+        try {
+          const errorBody = JSON.parse(error.message);
+          if (errorBody?.error?.message) {
+            errorMessage = errorBody.error.message;
+          } else {
+            errorMessage = error.message;
+          }
+        } catch {
+          errorMessage = error.message;
+        }
+      } else if (error?.error?.message) {
+        errorMessage = error.error.message;
+      }
+      toast.error(errorMessage);
     } finally {
       setIsEvaluating(false);
     }

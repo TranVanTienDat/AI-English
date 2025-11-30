@@ -73,9 +73,26 @@ export default function WritingPage() {
         geminiModel || "gemini-2.5-flash"
       );
       setQuestions(generatedQuestions);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError("Failed to generate questions. Please try again.");
+      let errorMessage = "Failed to generate questions. Please try again.";
+      if (err instanceof Error) {
+        try {
+          // Try to parse if the message is a JSON string (common in Google GenAI errors)
+          const errorBody = JSON.parse(err.message);
+          if (errorBody?.error?.message) {
+            errorMessage = errorBody.error.message;
+          } else {
+            errorMessage = err.message;
+          }
+        } catch {
+          // If not JSON, use the message directly
+          errorMessage = err.message;
+        }
+      } else if (err?.error?.message) {
+        errorMessage = err.error.message;
+      }
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -112,9 +129,24 @@ export default function WritingPage() {
 
       // Save to history (optional, maybe save all at once later?)
       // For now, let's just keep local state
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setError("Failed to evaluate. Please try again.");
+      let errorMessage = "Failed to evaluate. Please try again.";
+      if (err instanceof Error) {
+        try {
+          const errorBody = JSON.parse(err.message);
+          if (errorBody?.error?.message) {
+            errorMessage = errorBody.error.message;
+          } else {
+            errorMessage = err.message;
+          }
+        } catch {
+          errorMessage = err.message;
+        }
+      } else if (err?.error?.message) {
+        errorMessage = err.error.message;
+      }
+      setError(errorMessage);
     } finally {
       setEvaluating((prev) => ({ ...prev, [question.type]: false }));
     }
