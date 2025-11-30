@@ -55,7 +55,7 @@ export function LoginView() {
             Welcome to TOEIC AI
           </CardTitle>
           <CardDescription className="text-center text-muted-foreground">
-            Master TOEIC Writing with Gemini AI
+            Master TOEIC with AI
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
