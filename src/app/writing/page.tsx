@@ -587,11 +587,27 @@ export default function WritingPage() {
                             <h4 className="font-semibold text-success mb-2">
                               Better Version
                             </h4>
-                            <p className="text-foreground italic">
-                              {evaluationResult.better_version ||
-                                evaluationResult.sample_response ||
-                                evaluationResult.sample_essay}
-                            </p>
+                            {question.type === "task1" &&
+                            evaluationResult.questions ? (
+                              <div className="space-y-3">
+                                {evaluationResult.questions.map((q: any) => (
+                                  <div key={q.id} className="text-sm">
+                                    <span className="font-semibold text-success/80">
+                                      Sentence {q.id}:
+                                    </span>{" "}
+                                    <span className="text-foreground italic">
+                                      {q.better_version}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-foreground italic">
+                                {evaluationResult.better_version ||
+                                  evaluationResult.sample_response ||
+                                  evaluationResult.sample_essay}
+                              </p>
+                            )}
                           </div>
                         </div>
                       )}

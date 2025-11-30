@@ -37,6 +37,7 @@ Student Response (containing 5 sentences):
 - 0-3: No keywords OR incomprehensible OR off-topic.
 
 **IMPORTANT**: Provide ALL feedback and explanations in **VIETNAMESE** (Tiếng Việt).
+**EXCEPTION**: The "better_version" MUST be in **ENGLISH**.
 
 Return JSON:
 {
@@ -49,7 +50,7 @@ Return JSON:
       "score": number, // 0-10
       "keywords_used": { "keyword1": boolean, "keyword2": boolean },
       "errors": [{ "text": string, "correction": string, "explanation": string }],
-      "better_version": string, // Sample answer
+      "better_version": string, // Sample answer IN ENGLISH
       "feedback": string // Specific feedback for this sentence
     }
   ]

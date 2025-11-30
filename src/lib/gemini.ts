@@ -24,6 +24,14 @@ export interface EvaluationResult {
   sample_essay?: string;
   score_breakdown?: any;
   // Part 1 specific
+  questions?: Array<{
+    id: number;
+    score: number;
+    keywords_used: { keyword1: boolean; keyword2: boolean };
+    errors: Array<{ text: string; correction: string; explanation: string }>;
+    better_version: string;
+    feedback: string;
+  }>;
   keywords_used?: {
     keyword1: boolean;
     keyword2: boolean;
