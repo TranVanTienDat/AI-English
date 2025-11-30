@@ -259,9 +259,11 @@ Generate **5 Different Scenarios**, each with **Two Keywords**.
 - Format the "content" field for Part 1 as a **JSON String** of an array: \`[{ "id": 1, "scenario": "...", "keywords": ["...", "..."] }, ...]\`
 
 ### Part 2: Email Response
-Generate an **Incoming Email** with 2-4 requests.
+Generate an **Incoming Email** with 3-4 requests.
 - Include From, Subject, and Body.
 - Requests must be clear (e.g., ask for info, schedule meeting).
+- At least one request should be implicit (e.g., hinting at a problem, requiring the student to infer the need for a specific action or solution).
+- Vary the tone (e.g., formal request from a manager, slightly frustrated customer complaint, casual inquiry from a colleague).
 
 ### Part 3: Opinion Essay
 Generate an **Essay Topic/Question**.
@@ -327,6 +329,7 @@ ${JSON.stringify(questions, null, 2)}
 
 **SCORING INSTRUCTION:**
 Calculate "scaledScore" (5-495) as an ESTIMATED TOEIC Reading score based on the user's accuracy in this part.
+Use a standard approximate TOEIC score conversion table (e.g., 75/100 correct in Reading is around 380-400 points) to estimate the scaledScore.
 - Example: 100% accuracy -> ~495
 - Example: 70% accuracy -> ~300-350
 - Example: 50% accuracy -> ~200
@@ -349,7 +352,8 @@ Return JSON:
       "wrongOptions": [
         {
           "option": string,
-          "reason": string // Why this option is wrong (Vietnamese)
+          "reason": string, // Why this option is wrong (Vietnamese)
+          "errorType": "grammar" | "vocabulary"
         }
       ],
       "grammarPoint": string, // Grammar/vocabulary point tested (Vietnamese)
@@ -389,6 +393,7 @@ ${JSON.stringify(passages, null, 2)}
 
 **SCORING INSTRUCTION:**
 Calculate "scaledScore" (5-495) as an ESTIMATED TOEIC Reading score based on the user's accuracy in this part.
+Use a standard approximate TOEIC score conversion table (e.g., 75/100 correct in Reading is around 380-400 points) to estimate the scaledScore.
 
 Return JSON:
 {
@@ -463,6 +468,7 @@ ${JSON.stringify(passages, null, 2)}
 
 **SCORING INSTRUCTION:**
 Calculate "scaledScore" (5-495) as an ESTIMATED TOEIC Reading score based on the user's accuracy in this part.
+Use a standard approximate TOEIC score conversion table (e.g., 75/100 correct in Reading is around 380-400 points) to estimate the scaledScore.
 
 Return JSON:
 {
@@ -522,6 +528,7 @@ ${
     ? `
 ### Part 5: Incomplete Sentences
 Generate 10 questions testing grammar and vocabulary.
+Restrict vocabulary and topics to common professional, office, or business environments.
 ${
   batchNumber
     ? `This is batch ${batchNumber} of 3. Start question IDs from ${
@@ -539,6 +546,8 @@ ${
 
 **Difficulty Guidelines:**
 - Generate a mix of easy, medium, and hard questions to accurately assess the user's level.
+- The incorrect options (distractors) must be plausible. They should be grammatically correct but inappropriate for the context, or be a different word form that is grammatically correct in a different sentence structure. DO NOT generate obviously wrong answers.
+- Ensure the generated questions include a balance: approximately 50% focus on Grammar (tenses, word forms, conjunctions, prepositions) and 50% focus on Vocabulary (collocations, meaning in context).
 
 Return JSON:
 {
@@ -601,17 +610,17 @@ ${
 }
 ${
   batchNumber === 1
-    ? "Generate ~18-20 questions. Include: 4 Single Passages (approx 13-15 questions) and 1 Double Passage (5 questions)."
+    ? "Generate ~18-20 questions. Include: 4 Single Passages (3-4 questions each) and 1 Double Passage (exactly 5 questions)."
     : ""
 }
 ${
   batchNumber === 2
-    ? "Generate ~18-20 questions. Include: 3 Single Passages (approx 10 questions), 1 Double Passage (5 questions), and 1 Triple Passage (5 questions)."
+    ? "Generate ~18-20 questions. Include: 3 Single Passages (3-4 questions each), 1 Double Passage (exactly 5 questions), and 1 Triple Passage (exactly 5 questions)."
     : ""
 }
 ${
   batchNumber === 3
-    ? "Generate ~15 questions. Include: 3 Single Passages (approx 10 questions) and 1 Triple Passage (5 questions)."
+    ? "Generate ~15 questions. Include: 3 Single Passages (3-4 questions each) and 1 Triple Passage (exactly 5 questions)."
     : ""
 }
 
@@ -626,10 +635,11 @@ ${
 - Purpose questions (Why was this written)
 - Vocabulary in context
 - Reference questions (What does "it" refer to)
-- Cross-passage questions (for double/triple)
+- Cross-passage questions (for double/triple): You MUST include a minimum of one cross-reference question (requiring information synthesis from two or more texts) and mark it with questionType: "inference" or "reference".
 
 **Difficulty Guidelines:**
 - Generate a mix of easy, medium, and hard passages/questions.
+- Ensure that answer evidence for inference questions is not directly quoted but requires logical deduction.
 
 Return JSON:
 {
