@@ -54,7 +54,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Account Settings</DialogTitle>
           <DialogDescription>
@@ -62,8 +62,8 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="gemini-token" className="text-right">
+          <div className="flex flex-col gap-4">
+            <Label htmlFor="gemini-token" className="flex-1">
               Gemini Token
             </Label>
             <Input
@@ -71,12 +71,11 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
               type="password"
               value={currentToken}
               onChange={(e) => setCurrentToken(e.target.value)}
-              className="col-span-3"
               placeholder="Enter your Gemini API Key"
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="gemini-model" className="text-right">
+          <div className="flex flex-col gap-4">
+            <Label htmlFor="gemini-model" className="flex-1">
               Model
             </Label>
             <select
@@ -92,7 +91,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
               </option>
             </select>
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="flex flex-col gap-4">
             <Label htmlFor="ai-prompt" className="text-right">
               AI Prompt
             </Label>
