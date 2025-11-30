@@ -37,16 +37,16 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       <section>
-        <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
-          <Zap size={24} className="text-amber-500" /> Tools & Resources
+        <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
+          <Zap size={24} className="text-warning" /> Tools & Resources
         </h2>
         <div className="grid grid-cols-2 gap-6">
           {/* Generate Questions Card */}
           <Link href="/writing" className="block group">
-            <Card className="h-full hover:shadow-lg transition-all duration-300 border-slate-200 dark:border-slate-700 overflow-hidden">
+            <Card className="h-full hover:shadow-lg transition-all duration-300 border-border overflow-hidden">
               <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-emerald-500 bg-opacity-10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <NotebookPen className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <NotebookPen className="w-6 h-6 text-foreground" />
                 </div>
                 <CardTitle className="text-xl">
                   Generate Writing Question
@@ -59,7 +59,7 @@ export default function Dashboard() {
               <CardContent>
                 <Button
                   variant="ghost"
-                  className="w-full justify-between group-hover:bg-slate-50 dark:group-hover:bg-slate-800"
+                  className="w-full justify-between group-hover:bg-accent"
                 >
                   Start Practice <ArrowRight size={16} />
                 </Button>
@@ -68,10 +68,10 @@ export default function Dashboard() {
           </Link>
 
           <Link href="/reading" className="block group">
-            <Card className="h-full hover:shadow-lg transition-all duration-300 border-slate-200 dark:border-slate-700 overflow-hidden">
+            <Card className="h-full hover:shadow-lg transition-all duration-300 border-border overflow-hidden">
               <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-emerald-500 bg-opacity-10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <BookOpenText className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <BookOpenText className="w-6 h-6 text-foreground" />
                 </div>
                 <CardTitle className="text-xl">
                   Generate Reading Question
@@ -84,7 +84,7 @@ export default function Dashboard() {
               <CardContent>
                 <Button
                   variant="ghost"
-                  className="w-full justify-between group-hover:bg-slate-50 dark:group-hover:bg-slate-800"
+                  className="w-full justify-between group-hover:bg-accent"
                 >
                   Start Practice <ArrowRight size={16} />
                 </Button>
@@ -96,28 +96,28 @@ export default function Dashboard() {
 
       <section>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+          <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <History size={24} /> Recent History
           </h2>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
           {attempts && attempts.length > 0 ? (
-            <div className="divide-y divide-slate-100 dark:divide-slate-700">
+            <div className="divide-y divide-border">
               {attempts.map((attempt) => (
                 <div
                   key={attempt.id}
-                  className="p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors flex items-center justify-between"
+                  className="p-4 hover:bg-accent transition-colors flex items-center justify-between"
                 >
                   <div>
-                    <div className="font-medium text-slate-900 dark:text-white">
+                    <div className="font-medium text-foreground">
                       {attempt.taskType === "task1"
                         ? "Picture Sentence"
                         : attempt.taskType === "task2"
                         ? "Email Response"
                         : "Opinion Essay"}
                     </div>
-                    <div className="text-sm text-slate-500 dark:text-slate-400">
+                    <div className="text-sm text-muted-foreground">
                       {new Date(attempt.timestamp).toLocaleDateString()} •
                       Score: {attempt.score ?? "N/A"}
                     </div>
@@ -131,7 +131,7 @@ export default function Dashboard() {
               ))}
             </div>
           ) : (
-            <div className="p-8 text-center text-slate-500">
+            <div className="p-8 text-center text-muted-foreground">
               No practice attempts yet. Start one above!
             </div>
           )}

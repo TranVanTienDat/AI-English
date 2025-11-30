@@ -23,24 +23,20 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-muted/30 dark:bg-background">
       <Toaster richColors />
       <SettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
-      <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10">
+      <header className="bg-card dark:bg-card border-b border-border sticky top-0 z-10">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="font-bold text-xl text-blue-600 dark:text-blue-400">
-            TOEIC Writing AI
-          </div>
+          <div className="font-bold text-xl text-primary">TOEIC Writing AI</div>
 
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
-              className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-200"
+              className="flex items-center gap-2 text-sm font-medium text-foreground cursor-pointer"
               onClick={() => setIsSettingsOpen(true)}
             >
-              <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-300">
-                <UserIcon size={16} />
-              </div>
+              <UserIcon size={16} className="text-primary" />
               <span>{currentUser?.name}</span>
             </Button>
 
@@ -50,7 +46,10 @@ export default function DashboardLayout({
               onClick={handleLogout}
               title="Logout"
             >
-              <LogOut size={18} className="text-slate-500 hover:text-red-500" />
+              <LogOut
+                size={18}
+                className="text-primary hover:text-destructive"
+              />
             </Button>
           </div>
         </div>

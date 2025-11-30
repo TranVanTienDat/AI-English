@@ -42,13 +42,17 @@ export default function ResultPage({
 
       {/* Score Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="bg-linear-to-br from-blue-600 to-blue-800 text-white border-none">
+        <Card className="bg-linear-to-br from-primary to-primary/80 text-primary-foreground border-none">
           <CardHeader>
-            <CardTitle className="text-blue-100">Overall Score</CardTitle>
+            <CardTitle className="text-primary-foreground/80">
+              Overall Score
+            </CardTitle>
           </CardHeader>
           <CardContent className="flex items-end gap-2">
             <span className="text-6xl font-bold">{score}</span>
-            <span className="text-2xl text-blue-200 mb-2">/ {maxScore}</span>
+            <span className="text-2xl text-primary-foreground/60 mb-2">
+              / {maxScore}
+            </span>
           </CardContent>
         </Card>
 
@@ -57,7 +61,7 @@ export default function ResultPage({
             <CardTitle>General Feedback</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed">
               {aiFeedback?.feedback || "No feedback available."}
             </p>
           </CardContent>
@@ -76,21 +80,21 @@ export default function ResultPage({
           <div className="grid gap-4">
             {aiFeedback?.errors?.length > 0 ? (
               aiFeedback.errors.map((error: any, index: number) => (
-                <Card key={index} className="border-l-4 border-l-red-500">
+                <Card key={index} className="border-l-4 border-l-destructive">
                   <CardContent className="pt-6">
                     <div className="flex items-start gap-3">
                       <AlertCircle
-                        className="text-red-500 mt-1 shrink-0"
+                        className="text-destructive mt-1 shrink-0"
                         size={20}
                       />
                       <div>
-                        <div className="font-mono text-sm bg-red-50 text-red-700 px-2 py-1 rounded w-fit mb-2">
+                        <div className="font-mono text-sm bg-destructive/10 text-destructive px-2 py-1 rounded w-fit mb-2">
                           {error.text}
                         </div>
-                        <p className="font-semibold text-green-600 mb-1">
+                        <p className="font-semibold text-success mb-1">
                           Correction: {error.correction}
                         </p>
-                        <p className="text-slate-600 text-sm">
+                        <p className="text-muted-foreground text-sm">
                           {error.explanation}
                         </p>
                       </div>
@@ -99,8 +103,8 @@ export default function ResultPage({
                 </Card>
               ))
             ) : (
-              <Card className="bg-green-50 border-green-200">
-                <CardContent className="pt-6 flex items-center gap-4 text-green-700">
+              <Card className="bg-success/10 border-success/20">
+                <CardContent className="pt-6 flex items-center gap-4 text-success">
                   <CheckCircle size={24} />
                   <div>
                     <p className="font-semibold">Perfect!</p>
@@ -113,15 +117,15 @@ export default function ResultPage({
         </TabsContent>
 
         <TabsContent value="better" className="mt-6">
-          <Card className="bg-blue-50/50 border-blue-100">
+          <Card className="bg-primary/5 border-primary/10">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-blue-700">
+              <CardTitle className="flex items-center gap-2 text-primary">
                 <BookOpen size={20} /> Model Answer
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="prose prose-blue max-w-none">
-                <p className="whitespace-pre-wrap leading-relaxed text-slate-800">
+              <div className="prose max-w-none">
+                <p className="whitespace-pre-wrap leading-relaxed text-foreground">
                   {aiFeedback?.better_version ||
                     aiFeedback?.sample_response ||
                     aiFeedback?.sample_essay ||

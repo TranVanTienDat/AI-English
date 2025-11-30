@@ -128,13 +128,13 @@ export default function PracticePage({
                     className="object-cover"
                   />
                 </div>
-                <div className="bg-slate-100 dark:bg-slate-800 p-4 rounded-md">
+                <div className="bg-muted dark:bg-muted p-4 rounded-md">
                   <p className="font-semibold">Keywords:</p>
                   <div className="flex gap-2 mt-2">
                     {question.keywords.map((k: string) => (
                       <span
                         key={k}
-                        className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm font-medium"
+                        className="px-2 py-1 bg-primary/10 text-primary rounded text-sm font-medium"
                       >
                         {k}
                       </span>
@@ -146,18 +146,18 @@ export default function PracticePage({
 
             {type === "task2" && (
               <div className="space-y-4">
-                <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded border border-slate-200 dark:border-slate-700">
-                  <p className="text-sm text-slate-500 mb-2">
+                <div className="bg-muted/50 dark:bg-card p-4 rounded border border-border">
+                  <p className="text-sm text-muted-foreground mb-2">
                     From: {question.sender}
                   </p>
-                  <p className="text-sm text-slate-500 mb-4">
+                  <p className="text-sm text-muted-foreground mb-4">
                     Subject: {question.subject}
                   </p>
-                  <div className="whitespace-pre-wrap font-serif text-slate-800 dark:text-slate-200">
+                  <div className="whitespace-pre-wrap font-serif text-foreground">
                     {question.content}
                   </div>
                 </div>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-muted-foreground">
                   Directions: Respond to the email as if you are an employee at
                   the company.
                 </p>
@@ -166,13 +166,13 @@ export default function PracticePage({
 
             {type === "task3" && (
               <div className="space-y-4">
-                <div className="bg-slate-50 dark:bg-slate-900 p-6 rounded border border-slate-200 dark:border-slate-700">
+                <div className="bg-muted/50 dark:bg-card p-6 rounded border border-border">
                   <h3 className="font-semibold text-lg mb-2">Topic:</h3>
-                  <p className="text-slate-800 dark:text-slate-200 leading-relaxed">
+                  <p className="text-foreground leading-relaxed">
                     {question.topic}
                   </p>
                 </div>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-muted-foreground">
                   Directions: Write an essay in response to the above topic.
                   Give reasons and examples to support your opinion.
                 </p>
@@ -194,7 +194,7 @@ export default function PracticePage({
               onChange={(e) => setUserContent(e.target.value)}
             />
             <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-500">
+              <span className="text-sm text-muted-foreground">
                 Word count:{" "}
                 {
                   userContent

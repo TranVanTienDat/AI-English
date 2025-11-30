@@ -75,7 +75,7 @@ export default function ImportPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-8">
+    <div className="min-h-screen bg-muted/30 p-8">
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
           <Link href="/dashboard">
@@ -94,7 +94,7 @@ export default function ImportPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="border-2 border-dashed border-slate-200 rounded-lg p-8 text-center hover:bg-slate-50 transition-colors">
+            <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:bg-accent transition-colors">
               <input
                 type="file"
                 accept=".json"
@@ -106,25 +106,25 @@ export default function ImportPage() {
                 htmlFor="file-upload"
                 className="cursor-pointer flex flex-col items-center justify-center"
               >
-                <Upload className="h-10 w-10 text-slate-400 mb-4" />
-                <span className="text-sm font-medium text-slate-900">
+                <Upload className="h-10 w-10 text-muted-foreground mb-4" />
+                <span className="text-sm font-medium text-foreground">
                   {fileName || "Click to upload JSON file"}
                 </span>
-                <span className="text-xs text-slate-500 mt-1">
+                <span className="text-xs text-muted-foreground mt-1">
                   {fileName ? "Click to change file" : "or drag and drop"}
                 </span>
               </label>
             </div>
 
             {error && (
-              <div className="flex items-center p-4 text-red-800 bg-red-50 rounded-lg">
+              <div className="flex items-center p-4 text-destructive bg-destructive/10 rounded-lg">
                 <AlertCircle className="h-5 w-5 mr-2" />
                 <span className="text-sm">{error}</span>
               </div>
             )}
 
             {success && (
-              <div className="flex items-center p-4 text-green-800 bg-green-50 rounded-lg">
+              <div className="flex items-center p-4 text-success bg-success/10 rounded-lg">
                 <CheckCircle className="h-5 w-5 mr-2" />
                 <span className="text-sm">{success}</span>
               </div>

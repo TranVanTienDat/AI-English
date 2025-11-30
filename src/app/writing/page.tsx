@@ -188,7 +188,7 @@ export default function WritingPage() {
           <CardHeader>
             <div className="flex flex-row items-center justify-between">
               <CardTitle className="text-2xl flex items-center gap-2">
-                <Zap className="h-6 w-6 text-emerald-500" />
+                <Zap className="h-6 w-6 text-warning" />
                 Generate Writing Question
               </CardTitle>
 
@@ -229,7 +229,7 @@ export default function WritingPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             {!geminiToken && (
-              <div className="bg-amber-50 text-amber-800 p-4 rounded-lg text-sm">
+              <div className="bg-warning/10 text-warning-foreground p-4 rounded-lg text-sm">
                 Warning: No API Key found. Please configure it in Settings.
               </div>
             )}
@@ -312,8 +312,8 @@ export default function WritingPage() {
                                 wordCount < 120
                                   ? "text-red-600"
                                   : wordCount > 150
-                                  ? "text-amber-600"
-                                  : "text-emerald-600"
+                                  ? "text-warning"
+                                  : "text-success"
                               }`}
                             >
                               Word Count: {wordCount}/150 (Target: 120-150)
@@ -365,7 +365,7 @@ export default function WritingPage() {
                             <h3 className="text-xl font-bold text-slate-800">
                               Evaluation Result
                             </h3>
-                            <div className="text-2xl font-bold text-emerald-600 bg-emerald-50 px-4 py-2 rounded-lg">
+                            <div className="text-2xl font-bold text-success bg-success/10 px-4 py-2 rounded-lg">
                               {question.type === "task1"
                                 ? "Overall Score"
                                 : "Score"}
@@ -405,7 +405,7 @@ export default function WritingPage() {
                                             idx + 1
                                           }` as keyof typeof evaluationResult.keywords_used
                                         ]
-                                          ? "bg-emerald-100 text-emerald-800"
+                                          ? "bg-success/10 text-success"
                                           : "bg-red-100 text-red-800"
                                       }`}
                                     >
@@ -504,8 +504,8 @@ export default function WritingPage() {
                                         ? "text-red-600"
                                         : (evaluationResult.word_count || 0) >
                                           150
-                                        ? "text-amber-600"
-                                        : "text-emerald-600"
+                                        ? "text-warning"
+                                        : "text-success"
                                     }`}
                                   >
                                     {evaluationResult.word_count || wordCount}{" "}
@@ -565,7 +565,7 @@ export default function WritingPage() {
                                     <p className="text-red-800 font-medium line-through decoration-red-500">
                                       {error.text}
                                     </p>
-                                    <p className="text-emerald-700 font-medium mt-1">
+                                    <p className="text-success font-medium mt-1">
                                       → {error.correction}
                                     </p>
                                     <p className="text-sm text-slate-600 mt-1">
@@ -576,11 +576,11 @@ export default function WritingPage() {
                               </div>
                             )}
 
-                          <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-100">
-                            <h4 className="font-semibold text-emerald-800 mb-2">
+                          <div className="bg-success/10 p-4 rounded-lg border border-success/20">
+                            <h4 className="font-semibold text-success mb-2">
                               Better Version
                             </h4>
-                            <p className="text-emerald-900 italic">
+                            <p className="text-foreground italic">
                               {evaluationResult.better_version ||
                                 evaluationResult.sample_response ||
                                 evaluationResult.sample_essay}

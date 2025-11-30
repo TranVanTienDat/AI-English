@@ -48,13 +48,13 @@ export function LoginView() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-linear-to-br from-slate-900 to-slate-800 p-4">
-      <Card className="w-full max-w-md bg-white/10 backdrop-blur-md border-white/20 text-white shadow-xl">
+    <div className="flex items-center justify-center min-h-screen bg-background p-4">
+      <Card className="w-full max-w-md bg-card border-border shadow-xl">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">
+          <CardTitle className="text-2xl font-bold text-center text-foreground">
             Welcome to TOEIC AI
           </CardTitle>
-          <CardDescription className="text-center text-slate-300">
+          <CardDescription className="text-center text-muted-foreground">
             Master TOEIC Writing with Gemini AI
           </CardDescription>
         </CardHeader>
@@ -66,12 +66,12 @@ export function LoginView() {
               placeholder="Enter your name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="bg-white/5 border-white/10 text-white placeholder:text-slate-400 focus:border-blue-500"
+              className="bg-background border-input text-foreground placeholder:text-muted-foreground focus:border-primary"
             />
           </div>
 
           <Button
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-all duration-200"
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition-all duration-200"
             onClick={handleLogin}
             disabled={isLoading || !name.trim()}
           >
