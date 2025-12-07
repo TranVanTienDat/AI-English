@@ -404,3 +404,132 @@ export const analyzeProgress = async (
     );
   }
 };
+
+// ============================================
+// TRANSLATION PRACTICE FUNCTIONS
+// ============================================
+
+import {
+  GENERATE_VIETNAMESE_PASSAGES_PROMPT,
+  EVALUATE_TRANSLATION_PROMPT,
+} from "./prompts";
+
+export interface VietnamesePassage {
+  id: number;
+  vietnamese: string;
+  topic: string;
+  targetVocabulary: Array<{
+    vietnamese: string;
+    english: string;
+    explanation: string;
+  }>;
+}
+
+export interface TranslationEvaluation {
+  score: number;
+  feedback: string;
+  accuracy: {
+    score: number;
+    comment: string;
+  };
+  grammar: {
+    score: number;
+    errors: Array<{
+      text: string;
+      correction: string;
+      explanation: string;
+    }>;
+  };
+  vocabulary: {
+    score: number;
+    issues: Array<{
+      text: string;
+      suggestion: string;
+      explanation: string;
+    }>;
+    newWords: Array<{
+      vietnamese: string;
+      english: string;
+      context: string;
+    }>;
+  };
+  naturalness: {
+    score: number;
+    comment: string;
+  };
+  better_version: string;
+  suggestions: string[];
+}
+
+export const generateVietnamesePassages = async (
+  apiKey: string,
+  proficiencyLevel: "Beginner" | "Intermediate" | "Advanced" | "Expert",
+  passageLength: "20-30" | "40-50" | "60-80",
+  count: number = 10,
+  modelName: string = "gemini-2.5-flash"
+): Promise<VietnamesePassage[]> => {
+  const ai = new GoogleGenAI({ apiKey });
+  const prompt = GENERATE_VIETNAMESE_PASSAGES_PROMPT(
+    proficiencyLevel,
+    passageLength,
+    count
+  );
+
+  try {
+    const response = await ai.models.generateContent({
+      model: modelName,
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+      },
+    });
+
+    const text = response.text;
+    if (!text) throw new Error("No response from AI");
+
+    const json = JSON.parse(text);
+    return json.passages as VietnamesePassage[];
+  } catch (error) {
+    console.error("Error generating Vietnamese passages:", error);
+    throw new Error(
+      "Failed to generate passages. Please check your API Key and try again."
+    );
+  }
+};
+
+export const evaluateTranslation = async (
+  apiKey: string,
+  vietnamesePassage: string,
+  userTranslation: string,
+  proficiencyLevel: string,
+  targetVocabulary?: Array<{ vietnamese: string; english: string }>,
+  modelName: string = "gemini-2.5-flash"
+): Promise<TranslationEvaluation> => {
+  const ai = new GoogleGenAI({ apiKey });
+  const prompt = EVALUATE_TRANSLATION_PROMPT(
+    vietnamesePassage,
+    userTranslation,
+    proficiencyLevel,
+    targetVocabulary
+  );
+
+  try {
+    const response = await ai.models.generateContent({
+      model: modelName,
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+      },
+    });
+
+    const text = response.text;
+    if (!text) throw new Error("No response from AI");
+
+    return JSON.parse(text) as TranslationEvaluation;
+  } catch (error) {
+    console.error("Error evaluating translation:", error);
+    throw new Error(
+      "Failed to evaluate translation. Please check your API Key and try again."
+    );
+  }
+};

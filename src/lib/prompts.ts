@@ -690,3 +690,136 @@ Return JSON:
   "level": "A1" | "A2" | "B1" | "B2" | "C1" | "C2"
 }
 `;
+
+// ============================================
+// TRANSLATION PRACTICE PROMPTS
+// ============================================
+
+export const GENERATE_VIETNAMESE_PASSAGES_PROMPT = (
+  proficiencyLevel: "Beginner" | "Intermediate" | "Advanced" | "Expert",
+  passageLength: "20-30" | "40-50" | "60-80",
+  count: number = 10
+) => `
+You are an expert Vietnamese language teacher creating translation practice materials.
+
+Task: Generate ${count} Vietnamese passages for translation practice.
+
+**Requirements:**
+- Proficiency Level: ${proficiencyLevel}
+- Passage Length: ${passageLength} words each
+- Each passage should be on different topics (daily life, work, travel, technology, education, culture, etc.)
+- Include vocabulary appropriate to the level
+- Each passage MUST contain at least 2-3 useful new words that learners should learn
+- Passages should be natural, conversational Vietnamese
+
+**Level Guidelines:**
+- Beginner: Simple sentence structures, basic vocabulary, everyday topics
+- Intermediate: Mix of simple and complex sentences, common idioms, broader topics
+- Advanced: Complex sentences, advanced vocabulary, abstract topics, cultural references
+- Expert: Native-level complexity, idioms, formal/literary language, nuanced expressions
+
+**IMPORTANT**: Return ONLY valid JSON, no additional text.
+
+Return JSON:
+{
+  "passages": [
+    {
+      "id": number, // 1-${count}
+      "vietnamese": string, // The Vietnamese passage
+      "topic": string, // Topic of the passage
+      "targetVocabulary": [
+        {
+          "vietnamese": string,
+          "english": string,
+          "explanation": string // Brief explanation in Vietnamese
+        }
+      ]
+    }
+  ]
+}
+`;
+
+export const EVALUATE_TRANSLATION_PROMPT = (
+  vietnamesePassage: string,
+  userTranslation: string,
+  proficiencyLevel: string,
+  targetVocabulary?: Array<{ vietnamese: string; english: string }>
+) => `
+You are an expert English teacher and translation evaluator.
+
+Task: Evaluate the user's Vietnamese-to-English translation.
+
+Vietnamese Passage:
+"${vietnamesePassage}"
+
+User's English Translation:
+"${userTranslation}"
+
+User's Proficiency Level: ${proficiencyLevel}
+
+${
+  targetVocabulary
+    ? `Expected Vocabulary:\n${JSON.stringify(targetVocabulary, null, 2)}`
+    : ""
+}
+
+**Evaluation Criteria:**
+1. Accuracy: How well does the translation convey the original meaning?
+2. Grammar: Are there any grammatical errors?
+3. Vocabulary: Is the vocabulary appropriate and accurate?
+4. Naturalness: Does the English sound natural?
+5. Completeness: Is anything missing or added?
+
+**Scoring (0-100):**
+- 90-100: Excellent translation, native-like quality
+- 75-89: Good translation, minor issues
+- 60-74: Adequate translation, some errors but meaning is clear
+- 40-59: Poor translation, significant errors affecting meaning
+- 0-39: Very poor translation, meaning is lost
+
+**IMPORTANT**: Provide ALL feedback, explanations, and suggestions in **VIETNAMESE** (Tiếng Việt).
+Only the "better_version" should be in English.
+
+Return JSON:
+{
+  "score": number, // 0-100
+  "feedback": string, // Overall feedback in Vietnamese
+  "accuracy": {
+    "score": number, // 0-25
+    "comment": string // In Vietnamese
+  },
+  "grammar": {
+    "score": number, // 0-25
+    "errors": [
+      {
+        "text": string, // The error from user's translation
+        "correction": string, // Corrected version in English
+        "explanation": string // Explanation in Vietnamese
+      }
+    ]
+  },
+  "vocabulary": {
+    "score": number, // 0-25
+    "issues": [
+      {
+        "text": string, // Problematic word/phrase
+        "suggestion": string, // Better alternative
+        "explanation": string // Why it's better, in Vietnamese
+      }
+    ],
+    "newWords": [
+      {
+        "vietnamese": string,
+        "english": string,
+        "context": string // Example sentence in English
+      }
+    ]
+  },
+  "naturalness": {
+    "score": number, // 0-25
+    "comment": string // In Vietnamese
+  },
+  "better_version": string, // A high-quality English translation
+  "suggestions": string[] // List of improvement tips in Vietnamese
+}
+`;

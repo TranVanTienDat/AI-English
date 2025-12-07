@@ -20,6 +20,7 @@ import {
   TrendingUp,
   BrainCircuit,
   Loader2,
+  BookOpen,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -155,67 +156,89 @@ export default function Dashboard() {
         )}
       </section>
 
-      <section>
-        <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
-          <Zap size={24} className="text-primary" /> Tools & Resources
-        </h2>
-        <div className="grid grid-cols-2 gap-6">
-          {/* Generate Questions Card */}
-          <Link href="/writing" className="block group">
-            <Card className="h-full hover:shadow-lg transition-all duration-300 border-border overflow-hidden">
-              <CardHeader>
-                <div className="flex items-center gap-4 mb-5">
-                  <div className="w-12 h-12 rounded-lg bg-success flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <NotebookPen className="w-6 h-6 text-white" />
-                  </div>
-                  <CardTitle className="text-2xl">
-                    Generate Writing Question
-                  </CardTitle>
+      <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
+        <Zap size={24} className="text-primary" /> Tools & Resources
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Generate Questions Card */}
+        <Link href="/writing" className="block group">
+          <Card className="h-full hover:shadow-lg transition-all duration-300 border-border overflow-hidden">
+            <CardHeader>
+              <div className="flex items-center gap-4 mb-5">
+                <div className="w-12 h-12 rounded-lg bg-success flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <NotebookPen className="w-6 h-6 text-white" />
                 </div>
-                <CardDescription className="text-base">
-                  AI creates a new writing question (Part 1, 2, or 3) for you to
-                  practice.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-between group-hover:bg-accent"
-                >
-                  Start Practice <ArrowRight size={16} />
-                </Button>
-              </CardContent>
-            </Card>
-          </Link>
+                <CardTitle className="text-2xl">
+                  Generate Writing Question
+                </CardTitle>
+              </div>
+              <CardDescription className="text-base">
+                AI creates a new writing question (Part 1, 2, or 3) for you to
+                practice.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                variant="ghost"
+                className="w-full justify-between group-hover:bg-accent"
+              >
+                Start Practice <ArrowRight size={16} />
+              </Button>
+            </CardContent>
+          </Card>
+        </Link>
 
-          <Link href="/reading" className="block group">
-            <Card className="h-full hover:shadow-lg transition-all duration-300 border-border overflow-hidden">
-              <CardHeader>
-                <div className="flex items-center gap-4 mb-5">
-                  <div className="w-12 h-12 rounded-lg bg-success flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <BookOpenText className="w-6 h-6 text-white" />
-                  </div>
-                  <CardTitle className="text-2xl">
-                    Generate Reading Question
-                  </CardTitle>
+        <Link href="/reading" className="block group">
+          <Card className="h-full hover:shadow-lg transition-all duration-300 border-border overflow-hidden">
+            <CardHeader>
+              <div className="flex items-center gap-4 mb-5">
+                <div className="w-12 h-12 rounded-lg bg-success flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <BookOpenText className="w-6 h-6 text-white" />
                 </div>
-                <CardDescription className="text-base">
-                  AI creates reading questions (Part 5, 6, or 7) for you to
-                  practice.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-between group-hover:bg-accent"
-                >
-                  Start Practice <ArrowRight size={16} />
-                </Button>
-              </CardContent>
-            </Card>
-          </Link>
-        </div>
-      </section>
+                <CardTitle className="text-2xl">
+                  Generate Reading Question
+                </CardTitle>
+              </div>
+              <CardDescription className="text-base">
+                AI creates reading questions (Part 5, 6, or 7) for you to
+                practice.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                variant="ghost"
+                className="w-full justify-between group-hover:bg-accent"
+              >
+                Start Practice <ArrowRight size={16} />
+              </Button>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/practice/translation" className="block group">
+          <Card className="h-full hover:shadow-lg transition-all duration-300 border-border overflow-hidden bg-gradient-to-br from-purple-50 to-blue-50">
+            <CardHeader>
+              <div className="flex items-center gap-4 mb-5">
+                <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <BookOpen size={24} className="text-white" />
+                </div>
+                <CardTitle className="text-2xl">Translation Practice</CardTitle>
+              </div>
+              <CardDescription className="text-base">
+                Luyện dịch Việt - Anh với AI, mở rộng vốn từ vựng của bạn.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                variant="ghost"
+                className="w-full justify-between group-hover:bg-accent"
+              >
+                Bắt đầu <ArrowRight size={16} />
+              </Button>
+            </CardContent>
+          </Card>
+        </Link>
+      </div>
 
       <section>
         <div className="flex items-center justify-between mb-6">

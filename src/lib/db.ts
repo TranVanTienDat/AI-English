@@ -32,10 +32,21 @@ interface Question {
   keywords?: string[]; // For Task 1
 }
 
+interface Vocabulary {
+  id: number;
+  userId: number;
+  vietnamese: string;
+  english: string;
+  context?: string; // Example sentence
+  proficiencyLevel?: string; // Beginner, Intermediate, Advanced, Expert
+  addedAt: Date;
+}
+
 const db = new Dexie("ToeicWritingDB") as Dexie & {
   users: EntityTable<User, "id">;
   attempts: EntityTable<Attempt, "id">;
   questions: EntityTable<Question, "id">;
+  vocabulary: EntityTable<Vocabulary, "id">;
 };
 
 db.version(1).stores({
@@ -50,5 +61,12 @@ db.version(2).stores({
   questions: "++id, type, level",
 });
 
-export type { User, Attempt, Question };
+db.version(3).stores({
+  users: "++id, name",
+  attempts: "++id, userId, taskType, timestamp",
+  questions: "++id, type, level",
+  vocabulary: "++id, userId, addedAt",
+});
+
+export type { User, Attempt, Question, Vocabulary };
 export { db };
