@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/store/useStore";
 import { Button } from "@/components/ui/button";
+import { Container } from "@/components/ui/container";
 import { LogOut, User as UserIcon } from "lucide-react";
 import { SettingsDialog } from "@/components/SettingsDialog";
 import { Toaster } from "@/components/ui/sonner";
@@ -27,7 +28,7 @@ export default function DashboardLayout({
       <Toaster richColors />
       <SettingsDialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
       <header className="bg-card dark:bg-card border-b border-border sticky top-0 z-10">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        <Container className="h-16 flex items-center justify-between">
           <div className="font-bold text-xl text-primary">TOEIC Writing AI</div>
 
           <div className="flex items-center gap-4">
@@ -52,10 +53,12 @@ export default function DashboardLayout({
               />
             </Button>
           </div>
-        </div>
+        </Container>
       </header>
 
-      <main className="container mx-auto px-4 py-8">{children}</main>
+      <main>
+        <Container className="py-8">{children}</Container>
+      </main>
     </div>
   );
 }

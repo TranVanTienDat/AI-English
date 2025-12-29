@@ -12,6 +12,8 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Container } from "@/components/ui/container";
+import { PageHeader } from "@/components/ui/page-header";
 import { Upload, ArrowLeft, CheckCircle, AlertCircle } from "lucide-react";
 import Link from "next/link";
 
@@ -75,25 +77,24 @@ export default function ImportPage() {
   };
 
   return (
-    <div className="min-h-screen bg-muted/30 p-8">
-      <div className="max-w-2xl mx-auto">
-        <div className="mb-6">
-          <Link href="/dashboard">
-            <Button variant="ghost" className="pl-0 hover:pl-2 transition-all">
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
-            </Button>
-          </Link>
-        </div>
+    <Container className="py-8">
+      <PageHeader
+        title="Import Question Bank"
+        description="Upload a JSON file containing an array of questions to add to your local database."
+        actions={
+          <div className="flex items-center gap-2">
+            <Link href="/dashboard">
+              <Button variant="outline" size="sm" className="gap-2">
+                <ArrowLeft className="h-4 w-4" /> Back to Dashboard
+              </Button>
+            </Link>
+          </div>
+        }
+      />
 
+      <div className="max-w-2xl mx-auto mt-8">
         <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Import Question Bank</CardTitle>
-            <CardDescription>
-              Upload a JSON file containing an array of questions to add to your
-              local database.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-6 pt-6">
             <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:bg-accent transition-colors">
               <input
                 type="file"
@@ -141,6 +142,6 @@ export default function ImportPage() {
           </CardFooter>
         </Card>
       </div>
-    </div>
+    </Container>
   );
 }

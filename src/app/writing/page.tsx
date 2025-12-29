@@ -2,6 +2,7 @@
 
 import { QuestionPrompt } from "@/components/QuestionPrompt";
 import { Button } from "@/components/ui/button";
+import { Container } from "@/components/ui/container";
 import {
   Card,
   CardContent,
@@ -11,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PageHeader } from "@/components/ui/page-header";
 import { Textarea } from "@/components/ui/textarea";
 import { db } from "@/lib/db";
 import {
@@ -183,37 +185,43 @@ export default function WritingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-8 ">
-      <div className="flex items-center justify-between fixed top-0 left-0 right-0 px-8 py-2 bg-background">
-        <Link href="/dashboard">
-          <Button variant="ghost" className="pl-0 hover:pl-2 transition-all">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
-          </Button>
-        </Link>
+    <Container className="py-8">
+      <PageHeader
+        title="Generate Writing Question"
+        description="AI creates a new writing question (Part 1, 2, or 3) for you to practice."
+        actions={
+          <div className="flex items-center gap-2">
+            <Link href="/dashboard">
+              <Button variant="outline" size="sm" className="gap-2">
+                <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+              </Button>
+            </Link>
+            <Button
+              onClick={handleSave}
+              disabled={!questions.length || saved}
+              size="sm"
+            >
+              {saved ? (
+                <>
+                  <Check className="mr-2 h-4 w-4" /> Saved
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" /> Save Results
+                </>
+              )}
+            </Button>
+          </div>
+        }
+      />
 
-        <Button
-          onClick={handleSave}
-          disabled={!questions.length || saved}
-          className="ml-2"
-        >
-          {saved ? (
-            <>
-              <Check className="mr-2 h-4 w-4" /> Saved
-            </>
-          ) : (
-            <>
-              <Save className="mr-2 h-4 w-4" /> Save Results
-            </>
-          )}
-        </Button>
-      </div>
-      <div className="mx-auto mt-12">
+      <div className="mt-8">
         <Card>
           <CardHeader>
             <div className="flex flex-row items-center justify-between">
               <CardTitle className="text-2xl flex items-center gap-2">
                 <Zap className="h-6 w-6 text-warning" />
-                Generate Writing Question
+                Generate Options
               </CardTitle>
 
               <div>
@@ -619,6 +627,6 @@ export default function WritingPage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </Container>
   );
 }

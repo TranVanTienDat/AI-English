@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Container } from "@/components/ui/container";
+import { PageHeader } from "@/components/ui/page-header";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -63,38 +65,42 @@ export default function ResultPage({
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <Container className="py-8">
       {/* Header */}
-      <div className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+      <PageHeader
+        title="Result Analysis"
+        description={
+          taskType === "task1"
+            ? "Picture Description Description"
+            : taskType === "task2"
+            ? "Email Response Analysis"
+            : "Opinion Essay Feedback"
+        }
+        actions={
+          <div className="flex items-center gap-2">
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
               onClick={() => router.push("/dashboard")}
-              className="-ml-2"
+              className="gap-2"
             >
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back
+              <ArrowLeft className="h-4 w-4" /> Back to Dashboard
             </Button>
-            <div className="h-6 w-px bg-border hidden sm:block" />
-            <h1 className="text-lg font-semibold hidden sm:block">
-              Result Analysis
-            </h1>
+            <Badge
+              variant="outline"
+              className="uppercase tracking-wider font-mono hidden md:inline-flex"
+            >
+              {taskType === "task1"
+                ? "Picture"
+                : taskType === "task2"
+                ? "Email"
+                : "Essay"}
+            </Badge>
           </div>
-          <Badge
-            variant="outline"
-            className="uppercase tracking-wider font-mono"
-          >
-            {taskType === "task1"
-              ? "Picture Description"
-              : taskType === "task2"
-              ? "Email Response"
-              : "Opinion Essay"}
-          </Badge>
-        </div>
-      </div>
+        }
+      />
 
-      <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+      <div className="space-y-8 mt-8">
         {/* Top Section: Score & Summary */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Score Card */}
@@ -294,50 +300,60 @@ export default function ResultPage({
           >
             {aiFeedback?.errors?.length > 0 ? (
               <div className="grid gap-4">
-                {aiFeedback.errors.map((error: any, index: number) => (
-                  <Card
-                    key={index}
-                    className="overflow-hidden border-l-4 border-l-destructive shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <CardContent className="p-6">
-                      <div className="flex flex-col md:flex-row gap-6">
-                        <div className="md:w-1/2 space-y-2">
-                          <div className="flex items-center gap-2 text-destructive font-semibold mb-1">
-                            <AlertTriangle size={16} />
-                            <span>Issue</span>
+                {aiFeedback.errors.map(
+                  (
+                    error: {
+                      text: string;
+                      explanation: string;
+                      correction: string;
+                      type?: string;
+                    },
+                    index: number
+                  ) => (
+                    <Card
+                      key={index}
+                      className="overflow-hidden border-l-4 border-l-destructive shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <CardContent className="p-6">
+                        <div className="flex flex-col md:flex-row gap-6">
+                          <div className="md:w-1/2 space-y-2">
+                            <div className="flex items-center gap-2 text-destructive font-semibold mb-1">
+                              <AlertTriangle size={16} />
+                              <span>Issue</span>
+                            </div>
+                            <div className="p-3 bg-destructive/5 rounded-md text-destructive-foreground/90 font-medium border border-destructive/10">
+                              &quot;{error.text}&quot;
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              {error.explanation}
+                            </p>
                           </div>
-                          <div className="p-3 bg-destructive/5 rounded-md text-destructive-foreground/90 font-medium border border-destructive/10">
-                            "{error.text}"
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            {error.explanation}
-                          </p>
-                        </div>
 
-                        <div className="hidden md:flex items-center justify-center">
-                          <div className="p-2 rounded-full bg-muted">
-                            <ArrowLeft className="h-4 w-4 rotate-180 text-muted-foreground" />
+                          <div className="hidden md:flex items-center justify-center">
+                            <div className="p-2 rounded-full bg-muted">
+                              <ArrowLeft className="h-4 w-4 rotate-180 text-muted-foreground" />
+                            </div>
                           </div>
-                        </div>
 
-                        <div className="md:w-1/2 space-y-2">
-                          <div className="flex items-center gap-2 text-green-600 dark:text-green-400 font-semibold mb-1">
-                            <Check size={16} />
-                            <span>Correction</span>
+                          <div className="md:w-1/2 space-y-2">
+                            <div className="flex items-center gap-2 text-green-600 dark:text-green-400 font-semibold mb-1">
+                              <Check size={16} />
+                              <span>Correction</span>
+                            </div>
+                            <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-md text-green-700 dark:text-green-300 font-medium border border-green-100 dark:border-green-800">
+                              &quot;{error.correction}&quot;
+                            </div>
+                            {error.type && (
+                              <Badge variant="outline" className="text-xs">
+                                {error.type}
+                              </Badge>
+                            )}
                           </div>
-                          <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-md text-green-700 dark:text-green-300 font-medium border border-green-100 dark:border-green-800">
-                            "{error.correction}"
-                          </div>
-                          {error.type && (
-                            <Badge variant="outline" className="text-xs">
-                              {error.type}
-                            </Badge>
-                          )}
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  )
+                )}
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
@@ -347,8 +363,9 @@ export default function ResultPage({
                 <div className="space-y-2">
                   <h3 className="text-xl font-semibold">Excellent Work!</h3>
                   <p className="text-muted-foreground max-w-md mx-auto">
-                    We couldn't find any significant errors in your writing. You
-                    demonstrated great control over grammar and vocabulary.
+                    We couldn&apos;t find any significant errors in your
+                    writing. You demonstrated great control over grammar and
+                    vocabulary.
                   </p>
                 </div>
               </div>
@@ -406,6 +423,6 @@ export default function ResultPage({
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </Container>
   );
 }

@@ -29,6 +29,7 @@ import { processAttemptsForAI } from "@/lib/analytics";
 import { toast } from "sonner";
 import Markdown from "react-markdown";
 import { Badge } from "@/components/ui/badge";
+import { PageHeader } from "@/components/ui/page-header";
 
 export default function Dashboard() {
   const currentUser = useStore((state) => state.currentUser);
@@ -73,6 +74,11 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
+      <PageHeader
+        title="Dashboard"
+        description="Track your progress and practice TOEIC skills."
+      />
+
       {/* Analysis Section */}
       <section>
         <div className="flex items-center justify-between mb-6">

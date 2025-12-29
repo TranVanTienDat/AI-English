@@ -7,6 +7,8 @@ import { db } from "@/lib/db";
 import { evaluateWriting, EvaluationResult } from "@/lib/gemini";
 import { SAMPLE_TASKS } from "@/lib/data";
 import { Button } from "@/components/ui/button";
+import { Container } from "@/components/ui/container";
+import { PageHeader } from "@/components/ui/page-header";
 import { Textarea } from "@/components/ui/textarea"; // Need to add textarea
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -101,17 +103,24 @@ export default function PracticePage({
     );
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold capitalize">
-          {type.replace("task", "Task ")} Practice
-        </h1>
-        <Button variant="outline" onClick={() => router.push("/dashboard")}>
-          Exit
-        </Button>
-      </div>
+    <Container className="py-8">
+      <PageHeader
+        title={`${type.replace("task", "Task ")} Practice`}
+        description="Practice and improve your TOEIC Writing skills."
+        actions={
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => router.push("/dashboard")}
+            >
+              Exit
+            </Button>
+          </div>
+        }
+      />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
         {/* Question Section */}
         <Card className="h-fit">
           <CardHeader>
@@ -221,6 +230,6 @@ export default function PracticePage({
           </CardContent>
         </Card>
       </div>
-    </div>
+    </Container>
   );
 }

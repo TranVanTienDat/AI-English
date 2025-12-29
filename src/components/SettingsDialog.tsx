@@ -14,6 +14,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/store/useStore";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 
 interface SettingsDialogProps {
@@ -74,22 +81,22 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
               placeholder="Enter your Gemini API Key"
             />
           </div>
-          <div className="flex flex-col gap-4">
-            <Label htmlFor="gemini-model" className="flex-1">
-              Model
-            </Label>
-            <select
-              id="gemini-model"
-              value={currentModel}
-              onChange={(e) => setCurrentModel(e.target.value)}
-              className="col-span-3 flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
-              <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
-              <option value="gemini-3-pro-preview">
-                Gemini 3 Pro (Preview)
-              </option>
-            </select>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="gemini-model">Model</Label>
+            <Select value={currentModel} onValueChange={setCurrentModel}>
+              <SelectTrigger id="gemini-model">
+                <SelectValue placeholder="Select a model" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="gemini-2.0-flash">
+                  Gemini 2.0 Flash
+                </SelectItem>
+                <SelectItem value="gemini-2.0-pro-exp-02-05">
+                  Gemini 2.0 Pro Experimental
+                </SelectItem>
+                <SelectItem value="gemini-1.5-pro">Gemini 1.5 Pro</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="flex flex-col gap-4">
             <Label htmlFor="ai-prompt" className="text-right">

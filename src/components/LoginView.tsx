@@ -66,12 +66,12 @@ export function LoginView() {
               placeholder="Enter your name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="bg-background border-input text-foreground placeholder:text-muted-foreground focus:border-primary"
+              className="bg-background"
             />
           </div>
 
           <Button
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition-all duration-200"
+            className="w-full font-semibold"
             onClick={handleLogin}
             disabled={isLoading || !name.trim()}
           >

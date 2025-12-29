@@ -2,7 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Container } from "@/components/ui/container";
 import { Input } from "@/components/ui/input";
+import { PageHeader } from "@/components/ui/page-header";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { db } from "@/lib/db";
 import {
@@ -22,13 +24,12 @@ import {
   Zap,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Markdown from "react-markdown";
 import { toast } from "sonner";
 
 export default function ReadingPage() {
-  const router = useRouter();
+  // const router = useRouter(); // Removed unused router
   const { geminiToken, geminiModel, currentUser } = useStore();
 
   const delay = (ms: number) =>
@@ -64,7 +65,7 @@ export default function ReadingPage() {
     setLoadingStatus("Starting generation...");
 
     try {
-      let currentTest: GeneratedReadingTest = {
+      const currentTest: GeneratedReadingTest = {
         part: selectedPart,
         questions: [],
         passages: [],
@@ -144,7 +145,7 @@ export default function ReadingPage() {
       }
 
       toast.success("Đã tạo câu hỏi thành công!");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error generating question:", error);
       let errorMessage = "Không thể tạo câu hỏi. Vui lòng kiểm tra API Key.";
       if (error instanceof Error) {
@@ -158,8 +159,15 @@ export default function ReadingPage() {
         } catch {
           errorMessage = error.message;
         }
-      } else if (error?.error?.message) {
-        errorMessage = error.error.message;
+      } else if (
+        typeof error === "object" &&
+        error !== null &&
+        "error" in error
+      ) {
+        const errorBody = error as { error?: { message?: string } };
+        if (errorBody.error?.message) {
+          errorMessage = errorBody.error.message;
+        }
       }
       toast.error(errorMessage);
     } finally {
@@ -243,17 +251,17 @@ export default function ReadingPage() {
       if (currentUser) {
         await db.attempts.add({
           userId: currentUser.id,
-          taskType: `part${selectedPart}` as any,
+          taskType: `part${selectedPart}` as "part5" | "part6" | "part7",
           userContent: JSON.stringify(userAnswers),
           questionContent: JSON.stringify(generatedTest),
-          aiFeedback: result,
+          aiFeedback: result as any, // Cast to any for Dexie storage
           score: result.scaledScore,
           timestamp: new Date(),
         });
       }
 
       toast.success("Đã chấm bài thành công!");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error evaluating:", error);
       let errorMessage = "Không thể chấm bài. Vui lòng thử lại.";
       if (error instanceof Error) {
@@ -267,8 +275,15 @@ export default function ReadingPage() {
         } catch {
           errorMessage = error.message;
         }
-      } else if (error?.error?.message) {
-        errorMessage = error.error.message;
+      } else if (
+        typeof error === "object" &&
+        error !== null &&
+        "error" in error
+      ) {
+        const errorBody = error as { error?: { message?: string } };
+        if (errorBody.error?.message) {
+          errorMessage = errorBody.error.message;
+        }
       }
       toast.error(errorMessage);
     } finally {
@@ -644,215 +659,207 @@ export default function ReadingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50">
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
+    <Container className="py-8">
+      {/* Header */}
+      <PageHeader
+        title="TOEIC Reading Practice"
+        description="Practice Parts 5, 6, and 7 with AI-powered feedback"
+        actions={
+          <div className="flex items-center gap-2">
             <Link href="/dashboard">
-              <Button variant="ghost" size="icon">
-                <ArrowLeft className="w-5 h-5" />
+              <Button variant="outline" size="sm" className="gap-2">
+                <ArrowLeft className="w-4 h-4" /> Back to Dashboard
               </Button>
             </Link>
-            <div>
-              <h1 className="text-3xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                TOEIC Reading Practice
-              </h1>
-              <p className="text-muted-foreground">
-                Practice Parts 5, 6, and 7 with AI-powered feedback
-              </p>
-            </div>
           </div>
+        }
+      />
+
+      {!geminiToken && (
+        <div className="bg-destructive/10 text-destructive p-4 rounded-lg text-sm">
+          Warning: No API Key found. Please configure it in Settings.
         </div>
+      )}
 
-        {!geminiToken && (
-          <div className="bg-destructive/10 text-destructive p-4 rounded-lg text-sm">
-            Warning: No API Key found. Please configure it in Settings.
-          </div>
-        )}
-
-        {/* Generation Controls */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Zap className="w-5 h-5" />
-              Generate Practice Questions
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">
-                  Select Part
-                </label>
-                <Tabs
-                  value={selectedPart.toString()}
-                  onValueChange={(v) =>
-                    setSelectedPart(parseInt(v) as 5 | 6 | 7)
-                  }
-                >
-                  <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="5">Part 5</TabsTrigger>
-                    <TabsTrigger value="6">Part 6</TabsTrigger>
-                    <TabsTrigger value="7">Part 7</TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium mb-2 block">
-                  Topic (Optional)
-                </label>
-                <Input
-                  placeholder="e.g., Business, Travel..."
-                  value={topic}
-                  onChange={(e) => setTopic(e.target.value)}
-                />
-              </div>
+      {/* Generation Controls */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Zap className="w-5 h-5" />
+            Generate Practice Questions
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">
+                Select Part
+              </label>
+              <Tabs
+                value={selectedPart.toString()}
+                onValueChange={(v) => setSelectedPart(parseInt(v) as 5 | 6 | 7)}
+              >
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="5">Part 5</TabsTrigger>
+                  <TabsTrigger value="6">Part 6</TabsTrigger>
+                  <TabsTrigger value="7">Part 7</TabsTrigger>
+                </TabsList>
+              </Tabs>
             </div>
 
+            <div>
+              <label className="text-sm font-medium mb-2 block">
+                Topic (Optional)
+              </label>
+              <Input
+                placeholder="e.g., Business, Travel..."
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <Button
+            onClick={handleGenerate}
+            disabled={isGenerating || !geminiToken}
+            className="w-full"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {loadingStatus || "Generating..."}
+              </>
+            ) : (
+              <>
+                <Zap className="mr-2 h-4 w-4" />
+                Generate Questions
+              </>
+            )}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Questions Display */}
+      {generatedTest && (
+        <>
+          <div className="mb-6">
+            {selectedPart === 5 && renderPart5Questions()}
+            {selectedPart === 6 && renderPart6Passage()}
+            {selectedPart === 7 && renderPart7Passages()}
+          </div>
+
+          {/* Submit Button */}
+          {!evaluationResult && (
             <Button
-              onClick={handleGenerate}
-              disabled={isGenerating || !geminiToken}
+              onClick={handleEvaluate}
+              disabled={isEvaluating || Object.keys(userAnswers).length === 0}
               className="w-full"
+              size="lg"
             >
-              {isGenerating ? (
+              {isEvaluating ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {loadingStatus || "Generating..."}
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Evaluating...
                 </>
               ) : (
                 <>
-                  <Zap className="mr-2 h-4 w-4" />
-                  Generate Questions
+                  <CheckCircle2 className="mr-2 h-5 w-5" />
+                  Submit Answers
                 </>
               )}
             </Button>
+          )}
+
+          {/* Overall Results */}
+          {evaluationResult && (
+            <Card className="mt-6 border-2 border-blue-500">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ListChecks className="w-6 h-6" />
+                  Your Results
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center p-4 bg-blue-50 rounded-lg">
+                    <div className="text-3xl font-bold text-blue-600">
+                      {evaluationResult.correctAnswers}/
+                      {evaluationResult.totalQuestions}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Correct Answers
+                    </div>
+                  </div>
+                  <div className="text-center p-4 bg-green-50 rounded-lg">
+                    <div className="text-3xl font-bold text-green-600">
+                      {evaluationResult.scaledScore}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Est. TOEIC Score (5-495)
+                    </div>
+                  </div>
+                  <div className="text-center p-4 bg-purple-50 rounded-lg">
+                    <div className="text-3xl font-bold text-purple-600">
+                      {Math.round(
+                        (evaluationResult.correctAnswers /
+                          evaluationResult.totalQuestions) *
+                          100
+                      )}
+                      %
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Accuracy
+                    </div>
+                  </div>
+                  <div className="text-center p-4 bg-orange-50 rounded-lg">
+                    <div className="text-3xl font-bold text-orange-600">
+                      {evaluationResult.proficiencyLevel || "N/A"}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Proficiency Level
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <h3 className="font-semibold mb-2">Overall Feedback</h3>
+                  <p>
+                    <Markdown>{evaluationResult?.feedback || ""}</Markdown>
+                  </p>
+                </div>
+
+                <Button
+                  onClick={() => {
+                    setGeneratedTest(null);
+                    setUserAnswers({});
+                    setEvaluationResult(null);
+                  }}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Practice Again
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </>
+      )}
+
+      {/* Empty State */}
+      {!generatedTest && (
+        <Card className="border-dashed">
+          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+            <BookOpen className="w-16 h-16 text-muted-foreground mb-4" />
+            <h3 className="text-xl font-semibold mb-2">
+              Ready to Practice Reading?
+            </h3>
+            <p className="text-muted-foreground max-w-md">
+              Select a part, choose your target level, and generate practice
+              questions to start improving your TOEIC Reading skills.
+            </p>
           </CardContent>
         </Card>
-
-        {/* Questions Display */}
-        {generatedTest && (
-          <>
-            <div className="mb-6">
-              {selectedPart === 5 && renderPart5Questions()}
-              {selectedPart === 6 && renderPart6Passage()}
-              {selectedPart === 7 && renderPart7Passages()}
-            </div>
-
-            {/* Submit Button */}
-            {!evaluationResult && (
-              <Button
-                onClick={handleEvaluate}
-                disabled={isEvaluating || Object.keys(userAnswers).length === 0}
-                className="w-full"
-                size="lg"
-              >
-                {isEvaluating ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Evaluating...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle2 className="mr-2 h-5 w-5" />
-                    Submit Answers
-                  </>
-                )}
-              </Button>
-            )}
-
-            {/* Overall Results */}
-            {evaluationResult && (
-              <Card className="mt-6 border-2 border-blue-500">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <ListChecks className="w-6 h-6" />
-                    Your Results
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="text-center p-4 bg-blue-50 rounded-lg">
-                      <div className="text-3xl font-bold text-blue-600">
-                        {evaluationResult.correctAnswers}/
-                        {evaluationResult.totalQuestions}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Correct Answers
-                      </div>
-                    </div>
-                    <div className="text-center p-4 bg-green-50 rounded-lg">
-                      <div className="text-3xl font-bold text-green-600">
-                        {evaluationResult.scaledScore}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Est. TOEIC Score (5-495)
-                      </div>
-                    </div>
-                    <div className="text-center p-4 bg-purple-50 rounded-lg">
-                      <div className="text-3xl font-bold text-purple-600">
-                        {Math.round(
-                          (evaluationResult.correctAnswers /
-                            evaluationResult.totalQuestions) *
-                            100
-                        )}
-                        %
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Accuracy
-                      </div>
-                    </div>
-                    <div className="text-center p-4 bg-orange-50 rounded-lg">
-                      <div className="text-3xl font-bold text-orange-600">
-                        {evaluationResult.proficiencyLevel || "N/A"}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Proficiency Level
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <h3 className="font-semibold mb-2">Overall Feedback</h3>
-                    <p>
-                      <Markdown>{evaluationResult?.feedback || ""}</Markdown>
-                    </p>
-                  </div>
-
-                  <Button
-                    onClick={() => {
-                      setGeneratedTest(null);
-                      setUserAnswers({});
-                      setEvaluationResult(null);
-                    }}
-                    variant="outline"
-                    className="w-full"
-                  >
-                    Practice Again
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
-          </>
-        )}
-
-        {/* Empty State */}
-        {!generatedTest && (
-          <Card className="border-dashed">
-            <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-              <BookOpen className="w-16 h-16 text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">
-                Ready to Practice Reading?
-              </h3>
-              <p className="text-muted-foreground max-w-md">
-                Select a part, choose your target level, and generate practice
-                questions to start improving your TOEIC Reading skills.
-              </p>
-            </CardContent>
-          </Card>
-        )}
-      </div>
-    </div>
+      )}
+    </Container>
   );
 }
